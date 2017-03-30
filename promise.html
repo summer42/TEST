@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body></body>
+	<script>
+	function timeout(ms){
+		return new Promise(function(resolve,reject){
+			setTimeout(resolve,ms,'done')
+		})
+	}
+	timeout(2000).then(
+		function(val){
+			console.log(val);
+		}
+	)
+
+
+	var promise=new Promise(function(resolve,reject){
+		var i=0;
+		setTimeout(
+			function(){ i++;console.log(i);resolve(i);reject('失败')},1000);			
+	});
+	promise.then(
+		function(val){
+			console.log('成功'+' '+val)
+		},
+	
+		function(err){
+			console.log(err)
+		}
+	)
+
+
+	var p1 = new Promise(function (resolve, reject) {
+	  setTimeout(() => reject(new Error('fail')), 3000)
+	})
+
+	var p2 = new Promise(function (resolve, reject) {
+	  setTimeout(() => {resolve(p1);console.log(456)}, 1000)
+	})
+	p2
+    .then(
+	  	result => console.log(result),
+	  	(err)=>{console.log(err)}
+  	)
+  // .catch(error => console.log(error))//
+// Error: fail
+
+</script>
+</html>

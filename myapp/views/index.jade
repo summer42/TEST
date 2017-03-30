@@ -1,0 +1,14 @@
+extends layout
+
+block content
+  div(ng-app="app")
+    div(ng-controller="testController")
+        h1= title
+        p(ng-bind="text")
+        p Welcome to #{title}|test
+        if 1
+          div(ng-if="!flag")
+            test
+block scripts
+  script(src='/js/angular.js')
+  script(src='/js/angular-test1.js')

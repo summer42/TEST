@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<style type="text/css">
+			.wrapper {
+				width: 600px;
+				height: 200px;
+				margin: 0 auto;
+				overflow: hidden;
+				background-color: #5CB85C;
+			}
+			
+			#con-1,
+			#con-2 {
+				width: 600px;
+				height: 200px;
+				background-color: #66AFE9;
+				color: white;
+				font-size: 30px;
+				line-height: 150px;
+				display: block;
+				float: left;
+				margin: 0;
+			}
+			
+			.slide {
+				width: 300px;
+				float: left;
+				margin: 0;
+			}
+			
+			#con-2 {}
+			
+			span {
+				width: 20px;
+				height: 20px;
+				display: inline-block;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div class="wrapper" id="wrapper" onmouseover="y=setTimeout(end,200)" onmouseleave="start()">
+			<div style="width: 1300px">
+				<div id="con-1">
+					<div class="slide"><img src="img/p7.jpg" alt="" /></div>
+					<div class="slide"><img src="img/14.png" /></div>
+				</div>
+				<div id="con-2">
+				</div>
+			</div>
+
+		</div>
+		<span class="a1" onclick="next()">next</span>
+	</body>
+	<script language="javascript" type="text/javascript">
+		var Pagewidth = 600; //总宽度
+		var Unit = 300; //单个宽度
+		var speed = 15;
+		var i = setInterval(a, 10);
+
+		function GetObj(objName) {
+			if (document.getElementById) {
+				return eval('document.getElementById("' + objName + '")')
+			} else {
+				return eval('document.all.' + objName)
+			}
+		}
+		GetObj("con-2").innerHTML = GetObj("con-1").innerHTML;
+		function a() {
+			if (document.getElementById("wrapper").scrollLeft <= Pagewidth) {
+//				clearInterval(i);
+				document.getElementById("wrapper").scrollLeft += speed;
+				if (document.getElementById("wrapper").scrollLeft % Unit == 0) {
+					clearInterval(i);
+					setTimeout("i = setInterval(a, 10)", 700);
+				}
+			} else {
+				document.getElementById("wrapper").scrollLeft = 0;
+			}
+		}
+
+		function start() {
+			clearInterval(y);
+			clearInterval(i);
+			i = setInterval(a, 10);
+		}
+
+		function end() {
+			clearInterval(i);
+		}
+
+		function next() {
+			clearInterval(i);
+			if (document.getElementById("wrapper").scrollLeft % Pagewidth !== 0) {
+				document.getElementById("wrapper").scrollLeft = document.getElementById("wrapper").scrollLeft + Pagewidth - document.getElementById("wrapper").scrollLeft;
+			} else {
+				document.getElementById("wrapper").scrollLeft = document.getElementById("wrapper").scrollLeft + Pagewidth;
+			}
+			i = setInterval(a, 1);
+		}
+	</script>
+
+</html>

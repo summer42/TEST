@@ -1,0 +1,49 @@
+<!doctype html>
+<html ng-app="MyModule">
+	<head>
+		 <meta charset="utf-8">
+    	<meta name="viewport" content="width=device-width, initial-scale=1">
+	</head>
+	<body ng-controller='filterCtrl'>
+		<div>{{'asdadsa'|filter1}}</div>
+		<div>{{'test222'|addStr:'尾巴'}}</div>
+		<div>{{'datetime'|formatDate}}</div>
+		<ul ng-repeat='user in users|orderBy:"name":false'>
+			<li>{{user.name}} {{user.age}}</li>
+		</ul>
+	</body>
+	<script src="../js/Angular/angular.js"></script>
+	<script type="text/javascript">
+		var myModule=angular.module("MyModule",[]);
+		myModule.filter('filter1',function(){
+			return function(item){
+				return item + '^_^后缀';//字符自动加上后缀
+			}
+		}).filter('addStr',function(){
+			return function(input,str){
+				return input+' '+str;
+			}
+		}).filter('formatDate',()=>{
+			return (input,date)=>{
+				return input + new Date();
+			}
+		})
+		.controller('filterCtrl',['$scope',function($scope,$filter){
+			$scope.users=[
+				{name:"a",age:1},
+				{name:"b",age:3},
+				{name:"c",age:2}
+			] 
+			$scope.datetime=new Date();
+			// var orderBy=$filter('orderBy');
+			$scope.boundObj={a:1};
+			$scope.testFoo=function(a,b){
+				console.log(a+b);
+			}
+			var boundFoo=angular.bind($scope.boundObj,$scope.testFoo,10);
+			boundFoo(5);
+			// $scope.users=orderBy($scope.users,'age',true);
+		}])
+
+	</script>
+</html>

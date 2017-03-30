@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta http-equiv="X-UA-Compatible" content="IE=8">
+		<meta name="viewport" charset="utf-8" content="width=device-width, initial-scale=1.0 , maximum-scale=1">
+		<script src="js/jquery.cdn.js"></script>
+		<!--<script src="//cdn.bootcss.com/jquery/1.10.0/jquery.min.js"></script>-->
+		<title></title>
+		<style type="text/css">
+			html,
+			body {
+				height: 100%;
+				margin: 0;
+			}
+			
+			.main {
+				overflow: hidden; /*首先relative为了让nav-left基于main定位，否则main默认会和p标签的垂直外边距重叠，导致底部产生空隙*/
+				position: relative;/*其次，overflowhidden为了使父级容器形成bfc可以使p标签外边距不重叠*/
+				width: 100%;
+				height: 100%;
+			}
+			
+			.nav-left {
+				color: white;
+				position: absolute;
+				top: 0;
+				left: -200px;
+				width: 200px;
+				height: 100%;
+				background-color: #009CE2;
+			}
+			
+			.nav-left-icon {
+				text-align: center;
+				position: absolute;
+				right: -50px;
+				top: 20%;
+				width: 50px;
+				height: 50px;
+				background-color: #122B40;
+				cursor: pointer;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div class="main">
+			<p>文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字</p>
+			<div class="nav-left">
+				<div class="nav-left-icon">点我</div>
+				<p>文字文字文字文字文字文字文字文字</p>
+			</div>
+		<script type="text/javascript">
+			$(function() {
+				$(".nav-left-icon").click(function() {
+					if ($(".nav-left-icon").val() == 0) {
+						$(".nav-left").animate({
+							left: '-0'
+						},200);
+						$(".nav-left-icon").val(1);
+					} else {
+						$(".nav-left").animate({
+							left: '-200px'
+						},200);
+						$(".nav-left-icon").val(0);
+					}
+				});
+			});
+		</script>
+	</body>
+</html>

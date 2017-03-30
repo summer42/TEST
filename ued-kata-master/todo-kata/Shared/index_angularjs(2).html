@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="en"  ng-app="app" ng-controller='MyCtrl' >
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Template • TodoMVC</title>
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/index.css">
+    <!-- CSS overrides - remove if you don't need it -->
+    <link rel="stylesheet" href="css/app.css">
+    <!-- <link rel="stylesheet" href="vue.js"> -->
+    <style>
+        .none{
+            display:none!important;
+        }
+        .input_edit{
+            white-space: pre;
+            font-size: 24px;
+            word-break: break-word;
+            padding: 10px 60px 10px 10px;
+            margin-left: 45px;
+            font-weight: 100;
+            display: block;
+            line-height: 1.2;
+            transition: color 0.4s;
+            margin-left: 51px;
+            color: #4d4d4d;
+        }
+        [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+          display: none !important;
+        }
+    </style>
+</head>
+<!--
+    1. ng-cloak
+    2. angular.module 一个参数和两个参数
+    3. Controller
+        1) 帕斯卡命名
+        2) 依赖注入
+        3) 
+            属性声明
+            this.$onInit
+            $scope.$watch
+            $scope.$on
+            方法
+-->
+<body>
+    <div>
+    <div ui-view></div>   
+    </div> 
+</section>
+<footer class="info" >
+    <p>Double-click to edit a todo</p>
+    <!-- Remove the below line ↓ -->
+    <p>
+        Template by
+        <a href="http://sindresorhus.com">Sindre Sorhus</a>
+    </p>
+    <!-- Change this out with your name and url ↓ -->
+    <p>
+        Created by
+        <a href="http://todomvc.com">you</a>
+    </p>
+    <p>
+        Part of
+        <a href="http://todomvc.com">TodoMVC</a>
+    </p>
+</footer>
+<!-- Scripts here. Don't remove ↓ -->
+
+
+<script type='text/ng-template' id='index.html'>
+    <section class="todoapp">        
+        <header class="header">
+            <h1>todos</h1>            
+            <input class="new-todo" placeholder="What needs to be done?" autofocus ng-model="item" ng-keydown="add($event)"></header>
+
+        <!-- This section should be hidden by default and shown when there are todos -->
+        <section class="main">
+
+            <input class="toggle-all" ng-model='chk' type="checkbox" ng-click='selectAll(chk)'>
+            <label for="toggle-all">Mark all as complete</label>
+            <ul class="todo-list">
+                <!-- These are here just to show the structure of the list items -->
+                <!-- List items should get the class `editing` when editing and `completed` when marked as completed -->
+                <!-- <li class="completed">
+                <div class="view">
+                    <input class="toggle" type="checkbox" checked >
+                    <label>Taste JavaScript</label>
+                    <button class="destroy"></button>
+                </div>
+                <input class="edit" value="Create a TodoMVC template"></li>
+            -->
+                <li ng-repeat="item in items | filter:mulfilter" ng-class="{ completed: item.act }" ng-cloak>
+                    <div class="view" >
+                        <input class="toggle" type="checkbox" ng-model='item.act' ng-show='!item.isEditing'>
+                        <label ng-dblclick="edit(item)" ng-show="!item.isEditing">{{item.li}}</label>
+                        <button class="destroy" ng-click="del(item)"></button>
+                    </div>
+                    <form ng-submit='finishEdit($event,item,editingTodo.temp)'> 
+                      <input class="input_edit" ng-model="editingTodo.temp" ng-keyup='abortEdit($event,item,editingTodo.temp)' ng-show="item.isEditing"  ng-blur='finishEdit($event, item, editingTodo.temp)' >
+                    </form>
+              </li>
+            </ul>
+    </section>
+    <!-- This footer should hidden by default and shown when there are todos -->
+    <footer class="footer" ng-show='items != null && items.length > 0' ng-cloak>
+        <!-- This should be `0 items left` by default -->
+        <span class="todo-count"><strong>{{undonum}}</strong>
+            item left
+        </span>
+        <!-- Remove this if you don't implement routing -->
+        <ul class="filters">
+            <li>
+                <a href="#/" ng-class="{'selected':mulfilter==null}" ng-click="display()">All</a>
+            </li>
+            <li>
+                <a ui-sref='home({state:"active",foo:123})'  ng-class="{'selected':mulfilter.act==false}" >Active</a>
+            </li>
+            <li>
+                <a ui-sref='home({state:"completed",foo:123})'  ng-class="{'selected':mulfilter.act==true}" >Completed</a>
+            </li>
+        </ul>
+        <!-- Hidden if no completed items are left ↓ -->
+        <button class="clear-completed" ng-click='clearAll()'>Clear completed</button>
+    </footer>
+</script>
+</body>
+<!-- <script src="node_modules/todomvc-common/base.js"></script>
+<script src="js/app.js"></script> -->
+<script src="./angular.min.js"></script>
+<script src="./angular-ui-router.js"></script>
+<script src="https://rawgithub.com/gsklee/ngStorage/master/ngStorage.js"></script>
+
+<script>
+        angular.module('app', ['ngStorage','ui.router'])
+         .config( function ( $stateProvider, $urlRouterProvider ) {
+             'ngInject';
+             $urlRouterProvider.otherwise('/all');
+
+            $stateProvider
+                .state('home',{
+                    url: '/:state?foo',
+                    templateUrl: 'index.html',
+                    controller: 'MyCtrl'
+                });
+        })
+        .controller('MyCtrl', function($scope,$timeout,$localStorage,$sessionStorage,$filter, $state,$stateParams){
+            $scope.item = '';
+            $scope.chk=false;
+            $scope.items=[];
+            $scope.editingTodo = {
+                temp: null
+            };
+            $scope.temp='';      
+            $scope.edit_true=[0];
+            $scope.undonum=0;
+            $scope.a = null;
+            var id = 0;//初始化id
+            var KEYCODE = {
+                ENTER : 13,
+                ESC : 27
+            }
+            // $state.go('active',{act:true});
+            this.$onInit = () => {                
+                if($stateParams) {
+                    if($stateParams.state=='active'){
+                        console.log($stateParams);
+                        $scope.mulfilter = { act : false};
+                    }
+                    if($stateParams.state=='completed') {
+                        $scope.mulfilter = { act : true};
+                    }
+                }
+                if($localStorage&&$localStorage.localItems){
+                    if($localStorage.localItems.length>0){
+                        $scope.items=$localStorage.localItems;
+                        //获取未完成数量
+                        $scope.undonum = $scope.items.filter(function(item){
+                            return !item.act;
+                        }).length;
+                        //防止重复id
+                        id = $scope.items[$scope.items.length-1].id+1;
+                    }
+                }                
+            }
+            $scope.con=function(item){
+                console.log(item);
+            }      
+            console.log($scope.mulfilter);
+            $scope.add=function(e){                
+                // var e = event || window.event || arguments.callee.caller.arguments[0];                
+                if(e && e.keyCode === 13 && $scope.item!==""){                     
+                     var newItem = {
+                         li : $scope.item,
+                         act : false,
+                         isEditing : false,
+                         id : id
+                     };
+                     id++;
+                     $scope.items.push(newItem);
+                     console.log($scope.items);
+                     $scope.item = "";
+                }
+            }
+
+            $scope.selectAll=function(chk){
+                console.log(chk)
+                if(chk){
+                   $scope.items.forEach(x=>x.act=false); 
+                }
+                else{
+                    $scope.items.forEach(x=>x.act=true);
+                }
+                //- if($scope.items.filter(x=>x.act==true).length>0){
+                //-     console.log(31)
+                //-     $scope.items.forEach(x=>x.act=true);
+                //- }
+                //- if($scope.items.filter(x=>x.act===false).length===0){
+                //-     console.log(24)
+                //-     $scope.items.forEach(x=>x.act=false);
+                //- }
+            }
+            $scope.display=function(n){
+                switch(n){
+                    case "act":
+                        $scope.mulfilter={act:false};
+                        break;
+                    case "com":
+                        $scope.mulfilter={act:true};
+                        break;
+                    default:
+                        $scope.mulfilter=undefined;
+                        break;
+                }
+            }
+           
+            $scope.del=function(item){  
+                /*
+                    id: 2
+                    items = items.filter(x => x.id !== 2);
+                 */
+               $scope.items.splice($scope.items.indexOf(item),1);
+            }
+
+            $scope.edit=function(item){  
+               console.log(111,$scope.temp,item.li);
+               $scope.items.forEach(x=>x.isEditing=false); 
+               item.isEditing = true;
+               $scope.editingTodo.temp = item.li;           
+            };
+
+            $scope.abortEdit = function(e,item,temp){
+                var id = item.id;
+                let trueItem = $scope.items.find(x=> x.id===id);  
+                if(e && e.keyCode===KEYCODE.ESC){// TODO 按esc时放弃编辑
+                    //- $timeout(function(){
+                        console.log(321);
+                        trueItem.isEditing = false;
+                        $scope.editingTodo.temp = '';
+                        console.log(777,$scope.editingTodo.temp, temp);
+                    //- },0) 
+                     $timeout(function () { e.target.blur() }, 0, false);
+                }
+            }
+            
+            $scope.finishEdit = function(e,item, temp){                  
+                var id = item.id;
+                let trueItem = $scope.items.find(x=> x.id===id);              
+                if( temp !== "" ){//回车确认编辑
+                   trueItem.isEditing=false;
+                   trueItem.li=temp;
+                   console.log(999,trueItem.li,temp)
+                }
+                if(temp === ""){//回车后空值直接删除
+                    console.log(123);
+                    $scope.del(item);
+                }
+            };
+
+            $scope.acti=function(item,idx){  
+                item.act=!item.act;         
+            }
+
+            $scope.clearAll=function(){
+                $scope.items = $scope.items.filter(function(item) {
+                    return !item.act;
+                });
+                $scope.mulfilter = {act : null};
+            }
+
+            $scope.$watch('items',function(newval,oldval){
+                if(newval==oldval){
+                    return;
+                }
+                if($scope.items.filter(x=>x.act==false).length===0){
+                    $scope.chk=true;
+                }
+                $scope.undonum = $scope.items.filter(function(item){
+                    return !item.act;
+                }).length;
+                
+                $localStorage.localItems = $scope.items;
+                //- console.log($scope.$storage,$localStorage,$scope.items);
+            },true)
+        });
+
+    </script>
+</html>

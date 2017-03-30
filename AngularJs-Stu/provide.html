@@ -1,0 +1,54 @@
+<html ng-app="myModule">
+<head>
+	<script src="../js/Angular/angular.js"></script>
+	<script src="provide/provide.js" type="text/javascript" charset="utf-8"></script>
+</head>
+
+<body ng-controller='myCtrl'>
+
+	<div>
+		<ul ng-repeat='title in titlelist'>
+			<li>{{title}}</li>
+		</ul>
+	</div>
+	
+
+</body>
+</html>
+<script>
+	var app = angular.module('myModule', []);
+	// app.config(function($provide) {
+	//   $provide.constant('movieTitle', 'The Matrix');
+	// });
+	app.constant('t_con','By constant');
+	app.value('t_val','By value');
+	app.service('t_ser',function(a){
+		this.title='By service' + a;
+	});
+	app.factory('t_fac',function(){
+		return {
+			title:'By factory'
+		}
+	});
+	app.provider('t_pro',function(){
+		var ahead="Made by";
+		this.params1={};
+		console.log(this);
+		return {
+			setAhead:function(val){
+				ahead=val;
+			},
+			$get:function(){
+				return {
+					title:ahead+' '+'provider'
+				}
+			}
+		}
+	});
+	app.config(function(t_proProvider){
+		t_proProvider.setAhead("Come from");
+	})
+	app.controller('myCtrl', function ($scope,t_con,t_val,t_ser,t_fac,t_pro){
+  		$scope.titlelist=[t_con,t_val,t_ser(123).title,t_fac.title,t_pro.title];
+	});
+</script>

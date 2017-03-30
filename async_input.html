@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+</head>
+
+<body>
+    <div>
+        <button onclick='fooA()'>AA</button>
+<button onclick='fooB()'>BB</button>
+<input type="text" id='dist'>
+</div>
+</body>
+<script>
+                 (function () {
+                     var isLoading = false;
+                     var fooArr = [];
+                     function fooA() {
+                         isLoading = true;
+                         var bar = function () {
+                             var ajaxA = new Promise((resolve, reject) => {
+                                 setTimeout(function () {
+                                     resolve('data from A')
+                                 }, 1000)
+                             });
+                             ajaxA.then(function (data) {
+                                 isLoading = false;
+                                 document.getElementById('dist').value = data;
+                                 fooArr.forEach(function(x){x();});
+                             });
+                         };
+                         if (isLoading) {                             
+                             return;
+                         };
+                         fooArr.forEach(function(x){x();});
+                     }
+                     function fooB() {
+                         if (isLoading) {
+                             foo = function () {
+                                 var ajaxB = new Promise((resolve, reject) => {
+                                     setTimeout(function () {
+                                         resolve('data from B')
+                                     }, 100)
+                                 });
+                                 ajaxB.then(function (data) {
+                                     document.getElementById('dist').value = data;
+                                 })
+                             }
+                             return;
+                         }
+                         var ajaxB = new Promise((resolve, reject) => {
+                             setTimeout(function () {
+                                 resolve('data from B')
+                             }, 100)
+                         });
+                         ajaxB.then(function (data) {
+                             document.getElementById('dist').value = data;
+                         })
+                     }
+                 } ())
+</script>
+
+</html>

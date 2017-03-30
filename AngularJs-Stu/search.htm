@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+	<a href="search.htm?topic=1&id=2">测试</a>
+</body>
+</html>
+<script language="javascript">
+alert(window.location.search.substr(1).split("&"))
+//search  得到的是url中query部分
+//substr(1)去掉？
+//split()将一个字符串分割为子字符串，然后将结果作为字符串数组返回
+// 这里就是把query部分以&为分割符，分割
+</script>

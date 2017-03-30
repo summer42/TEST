@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" ng-app='myapp'>
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <style>
+        li>span {
+            display:inline-block;
+            margin-right:5px;
+        }
+    </style>
+</head>
+<body ng-controller='OrderController as order'>
+    <!--<order></order>-->
+    <ul style='display: block;
+    margin: 100px auto;
+    width: 50%;'>
+        <li>
+            <span>
+                <order></order>
+            </span>
+        </li>
+        <li ng-repeat='item in order.items'>
+            <span ng-bind='item.id'></span>
+            <span ng-bind='item.name'></span>
+            <span ng-bind='item.age'></span>            
+        </li>
+    </ul>
+</body>
+
+<script src="../js/Angular/angular.js"></script>
+<script src='directive/order.js'></script>
+</html>

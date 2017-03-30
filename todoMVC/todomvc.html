@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+<div>
+	<input id="entry" type="text">todoMVC
+	<a id="add"></a>
+</div>
+<div class="content">
+	<p><span class="ahead-icon"></span><a class="close" >×</a></p>
+</div>
+</body>
+<script src="../js/jquery-2.1.1.js"></script>
+<script>
+// window.onload=""
+// 	$("#list-entry").innertext
+
+$("#entry").keydown(function(event){
+            var e = event || window.event || arguments.callee.caller.arguments[0];
+            var entry_list = $(this)[0].value;
+                     
+             if(e && e.keyCode==13 && entry_list!==""){
+             	// var p_new.innertext=entry_list;
+             	$(".content").append("<p>"+entry_list+"</p>");
+             	$(".content p:eq(2)").append("<a class=\"close\">×</a>");             	
+            }
+        }); 
+</script>
+
+</html>

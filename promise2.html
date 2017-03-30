@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+</head>
+
+<body>
+    <div style="margin:20px;border:2px solid grey;width:100px;height:100px;display:inline-box" onclick="foo1()"></div>
+</body>
+<script>
+    var  foo1=function(){alert(1)};
+    var promise1=new Promise((resolve,reject)=>{        
+        setTimeout(()=>{
+            var i=1;
+            i++;
+            resolve(new Promise((resolve,rej)=>{
+                setTimeout(()=>{
+                    resolve('success1')
+                },0)
+            }));
+        },0);        
+    })
+    promise1.then((asd)=>{        
+        console.log(asd);
+    },
+    (reject)=>{
+        console.log(reject)
+    })     
+
+   
+    var promise2=new Promise((resolve,reject)=>{        
+        setTimeout(()=>{
+            var i=1;
+            i++;
+            resolve(i);
+        },0);        
+    })
+    var promise3=new Promise((resolve,reject)=>{
+        setTimeout(()=>{
+            resolve('success2')
+        },0)
+    });
+    promise2.then((resolve)=>{
+        console.log(resolve)
+        promise3.then((res)=>{
+            console.log(res);
+        })
+    })
+    // setTimeout(()=>{console.log(123)},100);
+    // setTimeout(()=>{console.log(321)},0);
+</script>
+
+</html>

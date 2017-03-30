@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+</head>
+
+<body ng-app='myapp'>
+    <div ng-controller='test'>
+
+    </div>
+
+</body>
+<script src="../js/Angular/angular.js"></script>
+<script>
+
+    angular.module('myapp', [])
+
+        .controller('test', ($q, $timeout, $parse, $scope) => {
+            $scope.user = { name: 'asd' };
+            var getter = $parse('user.name');
+            var setter = getter.assign;
+            var context = { user: { name: 'angular' } };
+            var locals = { user: { name: 'local' } };
+
+
+            var getter2 = function (s, l, a, i) {
+                var v5, v6, v7 = l && ('user' in l);
+                if (!(v7)) { if (s) { v5 = s.user; } } 
+                else { v5 = l.user; } if (v5 != null) { v6 = v5.name; } 
+                else { v6 = undefined; } return v6;
+            }
+        })
+
+</script>

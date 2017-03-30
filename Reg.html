@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<style>
+		#ctext{
+			display: inline-block;
+			width: 100px;
+			height: 20px;
+		}
+	</style>
+</head>
+<body>
+<input id="a1" type="text" value="asd"><button onclick="format()">验证邮箱是否合法</button><input id='a2' type="text">	
+</body>
+<script>	
+	function format(){
+		var otext=document.getElementById('a1').value;
+		// var re=new RegExp(/^\s*\w+@[a-z0-9]+\.\w+\s*$/);
+		var re=/^1[8|5|3]\d{8}$/
+		document.getElementById('a2').value=re.test(otext);
+	}
+</script>
+</html>

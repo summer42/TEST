@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<style>
+		div,span {
+			margin: 20px;
+		}
+		.popwrapper{
+			position: relative;
+			left: 185px;
+    		top: -21px;
+		}
+		.popbox{
+			border:1px solid grey;
+			border-radius: 5px;
+			width: 100px;
+		    height: 47px;
+		    top: -46px;
+			color: grey;
+			/*transition: all:0.35s;*/
+			padding-top:10px;
+			text-align: center;
+			position:absolute;
+			z-index:15;
+			background-color: white;
+		}
+		.pop_container{
+			margin: 0 auto;
+			margin-top: 100px;
+		    width: 200px;
+		}
+		 .pop_container input{
+		 	float: left;
+		}
+		.pagefloat{
+			display: inline-block;
+    		float: left;
+    		margin:0;
+		}
+		ul li{
+			list-style: none;
+			display: inline-block;
+			width:25px;
+			border:1px solid grey;
+			border-radius: 2px;
+			text-align: center;
+			/*color: grey;*/
+			line-height: 20px;
+			font-size: 18px;
+			cursor:pointer;
+		}
+		ul li.active,ul li:hover{
+			background-color: lightskyblue;
+			border:1px solid lightskyblue;
+			color: white;
+		}
+		.cusradio{
+			display: inline-block;
+			background-color: lightskyblue;
+			width: 15px;
+			height:15px;
+		}
+		.cusradio.active{			
+			background-color: lightsalmon;			
+		}
+		.cusradio input{
+			display: none;
+		}   
+	</style>
+</head>
+<body>
+	<div ng-app='app1' ng-controller='popCtrl'>
+		<div class='pop_container'>
+			<input type="text" ng-model='title1'>
+			<poptop subtitle='title1' foo1='print(con)'><span>正文1</span></poptop>
+			<input type="text" ng-model='title2'>
+			<poptop subtitle='title2' foo1='print(con)'><span>正文2</span></poptop>
+		</div>
+		<!-- <paginum></paginum>	 -->
+		<div class="" style='margin-left:30%;margin-bottom:50px;'>
+			<pagination pagenum="{{pagemax}}" ng-model='page.pageNo' page-size='page.pageSize' ng-change='print(page.pageNo)'></pagination>
+		</div>
+		<span ng-model='page.pageNo' ng-change='print()'>{{page.pageNo}}</span>	
+		<button ng-click='showModal=!showModal'>弹出</button>
+		<modal title="title1" show='showModal' onok='confirm()' oncancel='cancel()'><div class="body">texttext</div></modal>	
+		<draggable>拖动</draggable>
+		<hr>
+		<div class="">
+			<span>{{name}}</span>
+			<my-dialog>{{name}}</my-dialog>	
+		</div>
+		<hr>		
+		<tabs>
+			<tab-pane title='tabA'>
+				<p>asdasdasd</p>
+			</tab-pane>
+			<tab-pane title='tabB'>
+				<p>123123123</p>
+			</tab-pane>
+		</tabs>	
+		<hr>
+		<!--table list  -->
+		<table>
+			<thead>
+				<tr>
+					<th>a</th>
+					<th>b</th>
+					<th>c</th>
+				</tr>
+			</thead>
+			<tbody is-loading='list'>				
+				<tr ng-repeat='item in list'>
+					<td>{{item.a}}</td>
+					<td>{{item.b}}</td>
+					<td>{{item.c}}</td>
+				</tr>
+			</tbody>
+		</table>
+		<hr>
+		<table>
+			<thead>
+				<tr>
+					<th></th>
+					<th>a</th>					
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat='item in testList'><td>{{item.a}}</td></tr>
+			</tbody>
+		</table>
+	</div>
+	<script type='text/ng-template' id='my-dialog.html'>
+		<div class="alert" ng-transclude></div>
+	</script>
+</body>
+	<script src="../js/Angular/angular.js"></script>
+	<script src="../js/ui-bootstrap-tpls.js"></script>
+	<script src='directive/directives.js'></script>
+	
+</html>

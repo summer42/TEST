@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>alert</title>
+
+    <link rel="stylesheet" href="../../css/bootstrap.min.css">
+</head>
+
+<body ng-app='alert'>
+    <div ng-controller='AlertController' style='margin: 20px auto;width: 50%;text-align: center'>
+        <button ng-click='alert(modal_option)'>纯提示</button>
+        <button ng-click="alert({content:'提示内容',timer:1500})">纯提示1.5秒关闭</button>
+        <button ng-click='alert()'>默认是确认提示</button>
+        <button ng-click='delete()'>删除操作</button>
+        <button ng-click="alert({content:'您确定要删除吗？',reverse:true,type:'operate',theme:'danger'})">操作提示</button>
+
+    </div>
+</body>
+<script src='../../js/jquery-2.1.1.js'></script>
+<script src='../../js/bootstrap.min.js'></script>
+<script src='../../js/Angular/angular.js'></script>
+<script src='../../js/ui-bootstrap-tpls-2.5.0.js'></script>
+<script src="alert.js"></script>
+<script type='text/ng-template' id='alert.html'>
+    <style>
+        .modal-body.cus-modal {
+            font-size: 18px;
+            font-family: '微软雅黑';
+            text-indent: 25px;
+        }
+
+
+        .modal-body.timer-tip {
+            min-height: 100px;
+            text-align: center;
+            font-size: 20px;
+            margin-top: 25px;
+            text-indent: initial;
+        }
+
+
+        .modal-footer.reverse-btn>button {
+            float: right;
+            margin-right: 5px;
+        }
+
+
+        .modal-footer.tips-btn {
+            border-top: none;
+        }
+
+
+        .modal-footer.tips-btn>button {
+            display: block;
+            margin: 0 auto;
+            float: none;
+        }
+    </style>
+    <div class="modal-header" ng-if='option.showTitle'>
+        <h5 class="modal-title">{{option.title}}</h5>
+    </div>
+    <div class="modal-body cus-modal" ng-if='!option.template' ng-class="{'timer-tip':option.timer}">
+        {{option.content}}
+    </div>
+    <div class="modal-body cus-modal" ng-if='option.template' ng-include='option.template'></div>
+    <div ng-if="!option.timer&&(option.type!='tip')">
+        <div class="modal-footer" ng-if="option.type == 'operate'" ng-class="{'reverse-btn':option.reverse}">
+            <button class="btn btn-primary" ng-class="{'btn-danger':option.theme=='danger'}" type="button" ng-click="$close()">{{option.oktext}}</button>
+            <button class="btn btn-warning" type="button" ng-click="$dismiss()">{{option.canceltext}}</button>
+        </div>
+        <div class="modal-footer tips-btn" ng-if="option.type == 'confirm'">
+            <button class="btn btn-primary" type="button" ng-click="$dismiss()">{{option.oktext}}</button>
+        </div>
+    </div>
+</script>
+
+
+</html>

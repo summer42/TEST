@@ -1,0 +1,67 @@
+<!DOCTYPE html >
+<html lang="en" >
+<script src="../js/Angular/angular.js"></script>
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body  ng-app='myapp'>
+	<div ng-controller="parent">
+	我是父级   {{dataA}}  
+		<button ng-click='FooA()'>
+			childA的方法
+		</button>
+		<div ng-controller="Childa">
+            <div>我是childA    {{dataP}}
+            </div>
+            <button ng-click='clicked()'>click me
+            </button>
+		</div>
+		<div ng-controller="Childb">
+            <div>我是childB     {{dataC1}}</div>
+        </div>
+	</div>
+</body>
+
+<script>
+	var app=angular.module('myapp',[]);
+	app.controller('parent',function($scope){
+		$scope.dataP='This data is from parent';
+		
+		$scope.$broadcast('fromP',$scope.dataP);
+		$scope.$on('fromChildA',(e,params)=>{
+			$scope.dataA=params;
+		});
+		$scope.$on('sendFooA',(e,params)=>{
+			$scope.FooA=params;
+		});
+        $scope.$on('clicked',()=>{
+            console.log("has clicked")
+        })
+        
+		$scope.$broadcast('fromChildA',$scope.dataA);
+		
+	});
+	app.controller('Childa',function($scope){
+		$scope.dataC1='This data is from child1';
+		$scope.alertA=()=>{
+			alert("这是childA的方法");
+		};
+        $scope.clicked=()=>{
+            $scope.$emit('clicked');
+        }
+		$scope.$on('fromP',function(e,param){
+			$scope.dataP=params
+		});
+		$scope.$emit('fromChildA',$scope.dataC1);
+		$scope.$emit('sendFooA',$scope.alertA);
+	});
+	app.controller('Childb',function($scope){
+		$scope.dataC2='This data is from child2';
+		$scope.$on('fromChildA',(e,params)=>{
+			$scope.dataC1=parmas;
+		})
+	});
+
+</script>
+</html>

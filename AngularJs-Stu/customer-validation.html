@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en" ng-app='myapp'>
+<head>
+    <meta charset="UTF-8">
+    <title>validation</title>
+    <style>
+        [ng-cloak] {
+            display: none;
+        }
+    </style>
+</head>
+<body ng-controller="CusValidController">
+    <form novalidate name='nameForm' ng-submit='query()'>
+        <input type="text" ng-model='obj.name' required name='name' verify-name>
+        <span ng-show='nameForm.name.$error.cusName&&nameForm.$submitted' ng-cloak style='color:red;'>不能为1</span>
+        <span ng-show='nameForm.name.$error.verifyName' ng-cloak style='color:red;'>error222</span>
+        <button type='submit'>confirm</button>
+    </form>
+</body>
+<script src="../js/Angular/angular.js"></script>
+<script>
+    angular.module('myapp',[])
+    .controller('CusValidController',function($scope){
+        $scope.query = () => {
+            nameForm.$submitted = true;
+            if($scope.nameForm.$invalid) {
+                return;
+            }
+            console.log('success');
+        }
+    })
+    .directive('verifyName',()=>{
+        return {
+            restrict:'A',
+            require:'ngModel',
+            link:(scope,ele,attrs,ctrl)=>{
+                console.log(ctrl);
+                ctrl.$parsers.push((viewVal)=>{
+                    if(ctrl.$isEmpty(viewVal)) {
+                        return;
+                    }
+                    ctrl.$setValidity('verifyName',false);       
+                    return viewVal;
+                });
+                ctrl.$validators.cusName = (mval,vval) => {
+                    console.log(mval,vval);
+                    return !(vval == 1||mval ==1);
+                    
+                };
+                console.log(scope.nameForm.name.$error);
+            }
+        }
+    })
+</script>
+</html>

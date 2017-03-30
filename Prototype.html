@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title></title>
+</head>
+<body></body>
+	<script type="text/javascript">
+		console.log(Object.getOwnPropertyNames(Object.prototype));
+		console.log(Object.getOwnPropertyNames(Function))
+		function CreatePerson(name,age){
+			var obj =new Object;
+			obj.name=name;
+			obj.age=age;
+			return obj;//返回到外部
+		}
+		var Jim = CreatePerson("Jim",12);
+		console.log(Jim.name);
+
+
+
+		function CreatePerson_2(name,age){
+			this.name=name;
+			this.age=age;
+			this.show=function(){
+				console.log(this.age);
+			}
+		}
+		CreatePerson_2.prototype.setName=function(name){
+			this.name=name;
+			console.log(this);
+		}
+		var Tom= new CreatePerson_2("Tom",12);
+		var Jerry=new CreatePerson_2("je",5);
+		console.log(Tom.show()===Jerry.show());//true
+		Tom.setName("Green");
+
+
+		function Worker(job,name,age){
+			CreatePerson_2.call(this,name,age);
+			this.job=job;
+		}
+		for(var i in CreatePerson_2.prototype){
+			Worker.prototype[i]=CreatePerson_2.prototype[i];
+		}
+		var ZA=new Worker("cook","Zhang",13);
+		console.log(ZA);
+
+		ZA.setName("sun");
+
+		console.log(Worker._proto_)
+	</script>
+</html>

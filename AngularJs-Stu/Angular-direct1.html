@@ -1,0 +1,10 @@
+<html ng-app="MyModule">
+<body>
+	<div ng-controller="MyCtrl1">
+		<loader howToLoad="loadData()">鼠标经过加载</loader>
+	</div>
+	<div ng-controller="MyCtrl2">
+		<loader howToLoad="loadData2()">鼠标经过加载</loader><!-- 复用directive 用相同属性howtoload，然后用不同的controller显示不同内容 -->
+	</div>
+</body>
+</html>

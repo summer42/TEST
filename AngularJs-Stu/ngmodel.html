@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<style>
+		div,span {
+			margin: 20px;
+		}
+		.popwrapper{
+			position: relative;
+			left: 185px;
+    		top: -21px;
+		}
+		.popbox{
+			border:1px solid grey;
+			border-radius: 5px;
+			width: 100px;
+		    height: 47px;
+		    top: -46px;
+			color: grey;
+			/*transition: all:0.35s;*/
+			padding-top:10px;
+			text-align: center;
+			position:absolute;
+			z-index:15;
+			background-color: white;
+		}
+		.pop_container{
+			margin: 0 auto;
+			margin-top: 100px;
+		    width: 200px;
+		}
+		 .pop_container input{
+		 	float: left;
+		}
+		.pagefloat{
+			display: inline-block;
+    		float: left;
+    		margin:0;
+		}
+		ul li{
+			list-style: none;
+			display: inline-block;
+			width:25px;
+			border:1px solid grey;
+			border-radius: 2px;
+			text-align: center;
+			/*color: grey;*/
+			line-height: 20px;
+			font-size: 18px;
+			cursor:pointer;
+		}
+		ul li.active,ul li:hover{
+			background-color: lightskyblue;
+			border:1px solid lightskyblue;
+			color: white;
+		}
+		.cusradio{
+			display: inline-block;
+			background-color: lightskyblue;
+			width: 15px;
+			height:15px;
+		}
+		.cusradio.active{			
+			background-color: lightsalmon;			
+		}
+		.cusradio input{
+			display: none;
+		}   
+	</style>
+</head>
+<body>
+	<div ng-app='app1' ng-controller='popCtrl as test'>
+		<input type="text" ng-model='test.title' ng-model-options="{debounce: 1000,
+        updateOn:'blur'}">
+        <span ng-bind='test.title'></span>
+        <input type="text" ng-model='foo' ng-model-options="{getterSetter:true}">
+        <span ng-bind='test.foo()'></span>
+	</div>
+	
+</body>
+	<script src="../js/Angular/angular.js"></script>
+	<script src="../js/ui-bootstrap-tpls.js"></script>
+	<script src='directive/directives.js'></script>
+	<script>
+        angular.module("app1",[])
+        .controller('popCtrl',()=>{
+            this.title = 'asd';
+            this.foo = (x) => {
+                return x+' test'
+            }
+        })
+    </script>
+</html>

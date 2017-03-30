@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <style>
+        .content {
+            margin: 0 auto;
+        }        
+        ul li {
+            line-height: 40px;
+            font-size: 18px;
+        }
+    </style>
+
+</head>
+
+<body ng-app='myapp' ng-controller='choose' ng-keydown='multiChoose($event)' ng-keyup='resetMulti()'>
+    <div class="content" >
+        <ul>
+            <li ng-repeat='item in items'>
+                <input type="checkbox" ng-model='item.chk' ng-click='singChoose(item.chk,$index)' >
+            </li>
+        </ul>
+    </div>
+</body>
+<script src="../js/Angular/angular.min.js"></script>
+<script>
+    angular.module('myapp',[])
+    .controller('choose',function($scope,$timeout){
+        $scope.items = [
+            {id:1,chk:false},
+            {id:2,chk:false},
+            {id:3,chk:false},
+            {id:4,chk:false},
+            {id:5,chk:false}
+        ];
+
+
+
+        
+        let KEYCODE={
+            SHIFT : 16
+        }
+        $scope.multi = false;
+        let firstClick = '';
+        $scope.resetMulti = () => {
+            $scope.multi = false;
+            console.log($scope.multi);
+        };
+        $scope.multiChoose = (e) => {
+            if(e&&e.keyCode == KEYCODE.SHIFT) {
+                $scope.multi = true;
+            }
+        };
+        $scope.singChoose = (chk,lastClick)=> {
+            //记录第一次选中
+            if(!$scope.multi&&chk) {
+                firstClick = lastClick;
+            }
+            //清空第一次选中
+            if(!$scope.multi&&!chk) {
+                firstClick = '';
+            }
+            
+            if($scope.multi&&firstClick!==''){
+                $scope.items.forEach((x,idx)=>{
+                    if( (idx>=firstClick&&idx<=lastClick)||(idx<=firstClick&&idx>=lastClick) ) {
+                        x.chk = true;
+                    }
+                    else {
+                        x.chk = false;
+                        $timeout(()=>{
+                            $scope.items[lastClick].chk = true;
+                        },0)
+                    }
+                })
+            }
+        }
+    })
+</script>
+
+</html>

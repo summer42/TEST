@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+</head>
+<style>
+    .pagefloat{
+			display: inline-block;
+    		float: left;
+    		margin:0;
+		}
+		ul li{
+			list-style: none;
+			display: inline-block;
+			width:25px;
+			border:1px solid grey;
+			border-radius: 2px;
+			text-align: center;
+			/*color: grey;*/
+			line-height: 20px;
+			font-size: 18px;
+			cursor:pointer;
+		}
+		ul li.active,ul li:hover{
+			background-color: lightskyblue;
+			border:1px solid lightskyblue;
+			color: white;
+		}
+</style>
+<body ng-app='app1' ng-controller='comTest'>
+    <div>
+        <color>123123</color>
+    </div>
+    <button ng-click='showModal=!showModal'>弹出</button>
+    <modal title="title1" show='showModal' onok='confirm()' oncancel='cancel()'><div class="body">texttext</div></modal>
+    <pagination pagenum="{{pagemax}}"></pagination>	
+</body>
+<script src="../js/Angular/angular.min.js"></script>
+<script>
+    function ModalController ($scope){
+
+    }
+    var app=angular.module('app1',[]);
+    app.controller('comTest',function($scope){
+        $scope.showModal=false;
+        $scope.pagemax=7;
+		$scope.print=function(con){
+			if(con){
+				console.log(con);
+			}
+		};
+		$scope.confirm=function(){
+			$scope.showModal=false;
+			console.log("保存");
+		};
+		$scope.cancel=function(){
+			$scope.showModal=false;
+
+		}
+    }).directive('pagination',function(){
+		return {
+			restrict:'AE',			
+	        transclude : true,
+	        replace : true,
+	        scope:{
+	        	pagenum:"@"
+	        },
+	        template:'<div><button class="pagefloat" ng-click="prev()" ng-disabled="pagenumcur==0">上一页</button><ul class="pagefloat"><li ng-repeat="page in pages" ng-class="{active:page==pagenumcur}" ng-click="setpagecur(page)">{{page}}</li></ul><button class="pagefloat" ng-click="next()" ng-disabled="pagenumcur==pagemax">下一页</button></div>',
+	        link:function(scope,element){
+	        	scope.pagenumcur=1;
+	        	scope.pagemax=scope.pagenum;
+	        	scope.pages=[];
+	        	scope.prev=function(){
+	        		scope.pagenumcur--;
+	        	};
+	        	scope.next=function(){
+	        		scope.pagenumcur++;
+	        	}
+	        	scope.setpagecur=function(page){
+	        		scope.pagenumcur=page;
+	        	}
+	        	if(scope.pagemax){
+	        		for(var i=0;i<scope.pagemax;i++)
+	        		scope.pages.push(i);
+	        	}
+	        }
+		}
+	}).component('modal',{			
+        bindings: {
+            title: '=',  
+            onok: '&', 
+            oncancel: '&',
+            show: '='
+        },
+        transclude:true,
+        controller:ModalController,
+        template:'<div ng-show="show"><h3>{{title}}</h3><div class="body" ng-transclude></div><div class="footer"><button ng-click="onok()">Save changes</button><button ng-click="oncancel()">Close</button></div></div>'
+	})
+</script>
+
+</html>

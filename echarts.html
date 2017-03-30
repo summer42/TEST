@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+
+	<body>
+		<div class="big" style="width: 300px;height: 200px;">
+			<div id="graphic" class="col-md-8">
+				<div id="main" class="main" style="width:100%;min-height:200px;"></div>
+			</div>
+		</div>
+	</body>
+	<script src="js/echarts.min.js" type="text/javascript" charset="utf-8"></script>
+<script>
+			var myChart = echarts.init(document.getElementById('main'));
+			// 指定图表的配置项和数据
+			option = {
+				title: {
+					text: '折线图堆叠'
+				},
+				tooltip: {
+					trigger: 'axis'
+				},
+				legend: {
+					data: ['邮件营销']
+				},
+				grid: {
+					left: '3%',
+					right: '4%',
+					bottom: '3%',
+					containLabel: true
+				},
+				toolbox: {
+					feature: {
+//						dataZoom:{
+//							width:'100%',
+//						}
+						
+					}
+				},
+				xAxis: {
+					type: 'category',
+					boundaryGap: false,
+					data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
+				},
+				yAxis: {
+					type: 'value'
+				},
+				series: [{
+					name: '邮件营销',
+					type: 'line',
+					stack: '总量',
+					data: [120, 132, 101, 134, 90, 230, 210]
+				}]
+			};
+			// 使用刚指定的配置项和数据显示图表。
+			myChart.setOption(option);
+		</script>
+</html>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+	<body>
+		<div id="a1">aaaa</div>
+	</body>
+	<script type="text/javascript">
+//		for(i=1;i<4;i++){
+//			console.log(i);
+//		}//没问题
+		// for(let i=1;i<4;i++){//此处用let也可以
+			
+		// 		setTimeout(
+					
+		// 				function a(){
+		// 					console.log(i)
+		// 				}
+		// 			,0)
+			
+		// 	// document.getElementById("a1").addEventListener('click',function(){
+		// 	// 	console.log(i);
+		// 	// })//只输出4
+		// }
+		
+		for(var i=1;i<4;i++){//立即执行函数也是同步的，所以可以为里面异步的函数保留外部正确的i
+			!function(i){
+				console.log(i);
+				document.getElementById("a1").addEventListener('click',function(){
+					console.log(i);
+				})//没问题
+			}(i)			
+		}
+
+        // for(var i=1;i<4;i++){			
+		// 		document.getElementById("a1").addEventListener('click',!function(i){
+        //             return function(){
+        //                  console.log(i);   
+        //             }
+		// 		}(i))//没问题						
+		// }
+
+		var a={age:1};
+		var b=a;
+		b.name="asd";
+		console.log(a,b);
+		b={type:false};
+		console.log(a,b);
+	</script>
+</html>

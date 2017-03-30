@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<style type="text/css">
+			html,body{
+				height: 100%;
+			}
+		</style>
+	</head>
+	<body>
+		<div style="width: 200px;height: 300px;"><img src="img/p7.jpg"/></div>
+	</body>
+	<script src="js/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+	<script type="text/javascript">
+		$(function() {
+            img_pos_fix = function(img) {
+                $("img").each(
+                    function(){
+                        var minis_w = $(this).width() - $(this).parent().width();
+                        var minis_h = $(this).height() - $(this).parent().height();
+                        if( minis_w > 0 || minis_h < 0){
+                            $(this).css({'width':"initial",'height': "100%","margin-top":0})
+                            $(this).css('margin-left',minis_w/2*-1)
+                        }
+                        else{
+                            var img_w = $(this).width();
+                            var img_p_h = $(this).parent().outerHeight();
+                            var img_p_w = $(this).parent().outerWidth();
+                            
+                            var img_h_2 = img_w / ( img_p_w * img_p_h );
+                            // debugger;
+                            $(this).css({'margin-left':0,'width':"100%",'height': "initial"});
+                            $(this).css("margin-top",($(this).parent().height()-$(this).height())/2);
+                        }
+                    }
+                )
+            };
+            img_pos_fix('.active#tab5 .active .photos img');
+            $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+                var pane_id = $(this).attr('href');
+                img_pos_fix('.active#tab5 .active .photos img');
+            });
+            $(window).resize(
+                function(){
+                    img_pos_fix('.active#tab5 .active .photos img')
+                }
+            )
+        });
+
+	</script>
+</html>

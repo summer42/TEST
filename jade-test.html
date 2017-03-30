@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="">
+  <head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <script src="../js/Angular/angular.js"></script>
+  </head>
+  <body>
+    <div ng-controller="Con1">
+      <p>{{asd.a+" "+asd.b}}</p>
+      <input ng-model="asd.a">
+    </div>
+    <div ng-controller="List1">
+      <ul>
+        <li ng-repeat="name in names">{{name}} from {{department}}</li><br>				{{count}}
+      </ul>
+      <ul>
+        <li ng-repeat="s in [0]">
+          <button ng-click="Test1()">click this to alert</button>
+          <button ng-click="$emit('myEvent')">$emit('myEvent')//同层及以上</button>
+          <button ng-click="$broadcast('myEvent')">$broadcast('myEvent')</button><br>				{{count}}
+          <ul>
+            <li ng-repeat="t in [1,2]" ng-controller="list1">{{count}}</li>
+          </ul>
+        </li>
+      </ul>
+      <ul>
+        <li>a</li>
+        <li>12</li>
+        <li>123456</li>
+      </ul>
+    </div>
+  </body>
+  <!--script.
+  function Con1($scope,$rootScope){//rootscope根作用域 别的controller也可调用,作用于在本层找不到就向上找
+  $scope.asd={
+  a:'',
+  b:'双向绑定a'
+  };
+  $rootScope.department='根作用域的数组';
+  }
+  function List1($scope) {
+  $scope.names=['A','B','C'];
+  $scope.count=0;
+  $scope.$on('myEvent',function(){
+  $scope.count++;
+  });
+  $scope.Test1=function(){
+  alert("test")
+  }
+  }
+  -->
+</html>

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <div class="" id="B" target>
+        target
+        <span class="" current-target id='A' style='border: 1px solid black;' >
+            current-target
+        </span>
+    </div>
+
+</body>
+<script src="../js/jquery-1.10.2.js"></script>
+<script>
+    // $("[target]").bind('click', function (e) { console.log(e) });
+    document.getElementById('A').dispatchEvent(new Event('click',{bubble:true}));
+    document.querySelectorAll('#B')[0].addEventListener('click',function(e){
+        console.log(e.target,e.currentTarget);
+    })
+    document.querySelectorAll('#A')[0].addEventListener('click',function(e){
+        console.log(e.target,e.currentTarget);
+    })
+</script>
+
+</html>
