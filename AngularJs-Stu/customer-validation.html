@@ -39,7 +39,10 @@
                     if(ctrl.$isEmpty(viewVal)) {
                         return;
                     }
-                    ctrl.$setValidity('verifyName',false);       
+                    if(typeof viewVal == 'string') {
+                        //validators内部调用此方法,直接用validators就好
+                        ctrl.$setValidity('verifyName',false);
+                    }       
                     return viewVal;
                 });
                 ctrl.$validators.cusName = (mval,vval) => {
