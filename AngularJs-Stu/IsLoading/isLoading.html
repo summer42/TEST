@@ -11,11 +11,19 @@
         th {
             border: 1px solid #ccc
         }
+
+        [ng\:cloak],
+        [ng-cloak],
+        [data-ng-cloak],
+        [x-ng-cloak],
+        .ng-cloak,
+        .x-ng-cloak {
+            display: none !important;
+        }
     </style>
 </head>
 
 <body>
-    <div class="">{{data}}</div>
     <table table-list table-obj="users">
         <thead>
             <tr>
@@ -28,7 +36,7 @@
             </tr>
         </thead>
         <tbody>
-            <tr ng-repeat="user in users.list track by $index">
+            <tr ng-repeat="user in users.list track by $index" ng-cloak>
                 <td>{{user.name}}</td>
                 <td>{{user.age}}</td>
                 <td>{{user.tele}}</td>

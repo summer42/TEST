@@ -62,11 +62,11 @@
                     tableObj: '='
                 },
                 template: `                    
-                    <ng-transclude></ng-transclude>
+                    <ng-transclude></ng-transclude ng-cloak>
                     <tr ng-if='tableObj.isLoading'>
                         <td colspan='tdCount' style='text-align:center;'>正在加载</td>
                     </tr>
-                     <tr ng-if='!tableObj.isLoading&&tableObj.list.length == 0'>
+                     <tr ng-if='!tableObj.isLoading&&tableObj.list.length == 0' ng-cloak>
                         <td colspan='tdCount' style='text-align:center;'>暂无数据</td>
                     </tr>
                 `
