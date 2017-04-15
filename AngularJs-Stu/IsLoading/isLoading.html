@@ -6,20 +6,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title ng-bind="users.isLoading"></title>
+    <style>
+        td,
+        th {
+            border: 1px solid #ccc
+        }
+    </style>
 </head>
 
 <body>
     <div class="">{{data}}</div>
-    <table table-list="users">
+    <table table-list table-obj="users">
         <thead>
             <tr>
                 <th>姓名</th>
                 <th>年龄</th>
                 <th>手机号</th>
+                <th></th>
+                <th></th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
-            <tr ng-repeat="user in userList track by $index">
+            <tr ng-repeat="user in users.list track by $index">
                 <td>{{user.name}}</td>
                 <td>{{user.age}}</td>
                 <td>{{user.tele}}</td>

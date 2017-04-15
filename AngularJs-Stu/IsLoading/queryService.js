@@ -32,7 +32,7 @@
                         _this.isLoading = true;
                         // $http.post(url, param)
                         $q((resolve, reject) => {
-                            setTimeout(function () { resolve(data) }, 1500)
+                            setTimeout(function () { resolve([]) }, 1500)
                         }).then(function (result) {
                             _this.isLoading = false;
                             fn(result);
@@ -45,22 +45,31 @@
         .controller('IsLoadingController', function ($timeout, $scope, queryService) {
             var test = queryService.PersenalSummary;
             $scope.users = new test(function (data) {
-                $scope.userList = data;
+                $scope.users.list = data;
             });
             this.$onInit = function () {
-                $timeout(() => {
-                    $scope.users.query();
-                }, 600)
-
+                $scope.users.query();
             }
         })
         .directive('tableList', function () {
             return {
                 restrict: 'A',
+                transclude: true,
                 link: function (scope, attrs, ele) {
                     var tdCount = ele.$$element[0].querySelector('thead tr').childElementCount;
-                    console.log(tdCount)
-                }
+                },
+                scope: {
+                    tableObj: '='
+                },
+                template: `                    
+                    <ng-transclude></ng-transclude>
+                    <tr ng-if='tableObj.isLoading'>
+                        <td colspan='tdCount' style='text-align:center;'>正在加载</td>
+                    </tr>
+                     <tr ng-if='!tableObj.isLoading&&tableObj.list.length == 0'>
+                        <td colspan='tdCount' style='text-align:center;'>暂无数据</td>
+                    </tr>
+                `
             }
         })
 }(angular))
