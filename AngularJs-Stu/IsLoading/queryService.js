@@ -46,7 +46,6 @@
             var test = queryService.PersenalSummary;
             $scope.users = new test(function (data) {
                 $scope.userList = data;
-                console.log(this)
             });
             this.$onInit = function () {
                 $timeout(() => {
@@ -59,7 +58,8 @@
             return {
                 restrict: 'A',
                 link: function (scope, attrs, ele) {
-
+                    var tdCount = ele.$$element[0].querySelector('thead tr').childElementCount;
+                    console.log(tdCount)
                 }
             }
         })
