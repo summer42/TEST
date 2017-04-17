@@ -24,7 +24,7 @@
 </head>
 
 <body>
-    <table table-list table-obj="users">
+    <table>
         <thead>
             <tr>
                 <th>姓名</th>
@@ -35,8 +35,8 @@
                 <th></th>
             </tr>
         </thead>
-        <tbody>
-            <tr ng-repeat="user in users.list track by $index" ng-cloak>
+        <tbody table-list table-obj="users">
+            <tr ng-repeat="user in users.list track by $index"   ng-cloak>
                 <td>{{user.name}}</td>
                 <td>{{user.age}}</td>
                 <td>{{user.tele}}</td>
