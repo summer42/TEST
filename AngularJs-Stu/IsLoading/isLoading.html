@@ -24,19 +24,19 @@
 </head>
 
 <body>
-    <table>
+    <table table-list table-obj="users">
         <thead>
             <tr>
                 <th>姓名</th>
                 <th>年龄</th>
                 <th>手机号</th>
+                <!--<th colspan="2"></th>
                 <th></th>
-                <th></th>
-                <th></th>
+                <th></th>-->
             </tr>
         </thead>
-        <tbody table-list table-obj="users">
-            <tr ng-repeat="user in users.list track by $index"   ng-cloak>
+        <tbody>
+            <tr ng-repeat="user in users.list track by $index" ng-cloak>
                 <td>{{user.name}}</td>
                 <td>{{user.age}}</td>
                 <td>{{user.tele}}</td>
