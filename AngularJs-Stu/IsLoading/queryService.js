@@ -32,12 +32,7 @@
                     _this.isLoading = false;
                     _this.query = function () {
                         _this.isLoading = true;
-                        // $http.post(url, param)
-                        //reverse params
-                        // if(typeof fn !='function'&&typeof param =='function') {
-                        //     var callback = param;
-                        //     var _param = fn;
-                        // }
+                        //reverse params fn                      
                         $q((resolve, reject) => {
                             setTimeout(function () { resolve(data) }, 1500)
                         }).then(function (result) {
@@ -53,11 +48,12 @@
                                 errFn(err)
                             }
                             else {
-                                console.log(err);
+                                throw err;
                             }
                         })
                         return defer.promise;
                     }
+                    return _this;
                 }
             }
             this.PersenalSummary = PostQuery('/management/statistics/offline-line/logs');
@@ -65,18 +61,23 @@
         })
         .controller('IsLoadingController', function ($timeout, $scope, queryService) {
             this.$onInit = function () {
-                $scope.users.query();
+                // $scope.users.query();
             }
 
             var test = queryService.PersenalSummary;
-            $scope.users = new test(function (data) {
-                $scope.users.list = data;
-            });
-            $scope.users = new test();
-            // $scope.users.query().then(function (data) {
+            var test2 = queryService.test2;
+            // $scope.users = new test(function (data) {
             //     $scope.users.list = data;
-            // })
+            // });
+            $scope.users = test();
+            var promise2 = test2();
 
+            $scope.users.query(123).then(function (data) {
+                $scope.users.list = data;
+            })
+
+            // Promise.all([promise2.query(),$scope.users.query()])
+            // .then(result=>{console.log(result)})
 
 
         })
@@ -90,17 +91,14 @@
                 scope: {
                     tableObj: '='
                 },
-                template: `                    
-                   
+                template: ` 
                     <ng-transclude></ng-transclude ng-cloak>
                     <tr ng-if='tableObj.isLoading'>
-                        <td colspan='3' style='text-align:center;'>正在加载</td>
+                        <td colspan='99' style='text-align:center;'>正在加载</td>
                     </tr>
                      <tr ng-if='!tableObj.isLoading&&tableObj.list.length == 0' ng-cloak>
-                        <td colspan='3' style='text-align:center;'>暂无数据</td>
-                    </tr>
-                     
-                    
+                        <td colspan='99' style='text-align:center;'>暂无数据</td>
+                    </tr>                    
                 `
             }
         })
