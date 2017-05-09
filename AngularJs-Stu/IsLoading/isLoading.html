@@ -11,7 +11,7 @@
         th {
             border: 1px solid #ccc
         }
-
+        
         [ng\:cloak],
         [ng-cloak],
         [data-ng-cloak],
@@ -24,7 +24,8 @@
 </head>
 
 <body>
-    <span ng-bind="'test2'+query.isLoading"></span>
+    <span ng-bind="query.isLoading"></span></br>
+    <span ng-bind="users.isLoading"></span>
     <table table-list table-obj="users">
         <thead>
             <tr>

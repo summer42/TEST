@@ -16,9 +16,10 @@ var pubsub = {};
     };
     q.subscribe = function (topic, func) {
         if (!topics[topic]) {
-        topics[topic] = [];
+            topics[topic] = [];
         }
-        var token = (++subUid).toString(); topics[topic].push({ token: token, func: func });
+        var token = (++subUid).toString(); 
+        topics[topic].push({ token: token, func: func });
         return token;
     };
     q.unsubscribe = function (token) {

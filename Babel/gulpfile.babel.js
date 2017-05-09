@@ -22,6 +22,38 @@ gulp.task('release-js',
         .pipe(gulp.dest('/js/'))
 );
 
+/**
+ * 验证并转换前端 js。
+ */
+gulp.task('transpile', ['hint-js'],
+    () => gulp.src('/source/*.js')
+        .pipe(cached('transpile'))
+        .pipe(babel())
+        .pipe(preprocess({
+            context: {
+                NODE_ENV: 'development'
+            }
+        }))
+        .on('error', function (e) {
+            console.log([
+                '-----------transpile error-----------\n',
+                e.name,
+                ': ',
+                e.message,
+                '\n',
+                e.codeFrame,
+                '\n',
+                '-----------transpile error-----------'
+            ].join(''));
+            this.emit('end');
+        })
+        .pipe(ngAnnotate({
+            single_quotes: true
+        }))
+        .pipe(gulp.dest("/js/"))
+);
+
+
 gulp.task('css', function () {
     gulp.src('css/*.css')
         .pipe(cssmin())

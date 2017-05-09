@@ -59,10 +59,10 @@
 
             var PostQuerySingle = function (url) {
                 return function (param) {
-                    var obj = {};
-                    var defer = $q.defer();                   
+                    var obj = function () { };
+                    var defer = $q.defer();
                     obj.isLoading = false;
-                    obj = (function (param) {
+                    obj = function (param) {
                         obj.isLoading = true;
                         $q((resolve, reject) => {
                             setTimeout(function () { resolve(333) }, 1500)
@@ -71,12 +71,10 @@
                             defer.resolve(result);
                         })
                         return defer.promise;
-                    }(param));
+                    };
                     return obj
                 }
             };
-
-
 
             this.PersenalSummary = PostQuery('/management/statistics/offline-line/logs');
             this.test2 = PostQuerySingle('');
@@ -84,25 +82,24 @@
         .controller('IsLoadingController', function ($timeout, $scope, queryService) {
             this.$onInit = function () {
                 $scope.query();
+                $scope.queryUsers();
             }
 
             var test = queryService.PersenalSummary;
-            var test2 = queryService.test2;
-            // $scope.users = new test(function (data) {
-            //     $scope.users.list = data;
-            // });
+            var test2 = queryService.test2();
+
             $scope.users = test();
 
-            $scope.query = () => {
-                queryService.test2().then(d => console.log(d));
+            $scope.query = () => {               
+                test2().then(d => console.log(d));
             };
 
-
-
-            $scope.users.query(123).then(function (data) {
-                $scope.users.list = data;
-            });
-
+            $scope.queryUsers = () => {
+                test(function (data) {
+                    $scope.users.list = data;
+                }).query().then(d => console.log(d));
+            };
+            
             // Promise.all([promise2.query(),$scope.users.query()])
             // .then(result=>{console.log(result)})
 

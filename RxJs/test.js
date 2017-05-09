@@ -22,18 +22,22 @@ var B = () => new Promise((resolve, reject) => {
 var btnClick = Rx.Observable.fromEvent(btns, "click");
 
 btnClick
-    .switchMap(x => {
-        if (x.target.innerText == "A") {
-            return Rx.Observable.fromPromise(A())
-        }
-        return Rx.Observable.fromPromise(B())
-    })    
-    .subscribe(x => $input.val(x))
+    // .filter(x=>x.timeSamptle)
+    .map(x => x.target.innerText)
+    .subscribe(x => console.log(x))
+// .switchMap(x => {
+//     if (x.target.innerText == "A") {
+//         return Rx.Observable.fromPromise(A())
+//     }
+//     return Rx.Observable.fromPromise(B())
+// })    
+// .subscribe(x => $input.val(x))
 
 
 var observer = Rx.Observable.create(subscriber => {
     subscriber.next(1);
     subscriber.next(2);
 });
+
 observer.map(x => console.log(x));
 // }())    
