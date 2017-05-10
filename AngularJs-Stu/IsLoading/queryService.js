@@ -76,38 +76,51 @@
                     return obj
                 }
             };
-           
+            //
+            var Post = function (url) {
+                return function (param, fn) {
+                    var defer = $q.defer();
+                    fn.isLoading = false;
+                    return (function () {
+                        fn.isLoading = true;
+                        $http.post(url, param)
+                            .then(function (result) {
+                                fn.isLoading = false;
+                                defer.resolve(result);
+                            })
+                        return defer.promise;
+                    }());
+                }
+            };
+
+            this.users = Post('/manage/business/businessUserQuery');
+
 
             this.PersenalSummary = PostQuery('/management/statistics/offline-line/logs');
             this.test2 = PostQuerySingle('');
-            
+
         })
         .controller('IsLoadingController', function ($timeout, $scope, queryService) {
             this.$onInit = function () {
                 $scope.query();
-                $scope.queryUsers();
+                // $scope.queryUsers();
             }
             var params;
 
             var test = queryService.PersenalSummary;
             // var test2 = queryService.test2();
 
-           
+
 
             $scope.users = test();
 
             $scope.query = () => {
                 queryService.test2(1122)
-                .then(function(d){
-                    console.log(d)
-                });
+                    .then(function (d) {
+                        console.log(d)
+                    });
             };
 
-            $scope.queryUsers = () => {
-                test(function (data) {
-                    $scope.users.list = data;
-                }).query().then(d => console.log(d));
-            };
 
 
 
