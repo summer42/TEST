@@ -1,12 +1,14 @@
 {
   "name": "bairun",
-  "version": "0.1.0",  
+  "version": "0.1.0",
   "dependencies": {},
   "scripts": {
-    "gulp": "gulp watch"
+    "gulp": "gulp watch",
+    "precommit-msg": "echo 'Pre-commit checks...' && exit 0"
   },
   "pre-commit": [
-    "gulp"
+    "gulp",
+    "precommit-msg"
   ],
   "devDependencies": {
     "babel-cli": "^6.18.0",

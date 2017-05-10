@@ -59,39 +59,48 @@
 
             var PostQuerySingle = function (url) {
                 return function (param) {
+                    console.log(param)
                     var obj = function () { };
                     var defer = $q.defer();
                     obj.isLoading = false;
-                    obj = function (param) {
+                    obj = (function () {
                         obj.isLoading = true;
                         $q((resolve, reject) => {
-                            setTimeout(function () { resolve(333) }, 1500)
+                            setTimeout(function () { resolve(param) }, 1500)
                         }).then(function (result) {
                             obj.isLoading = false;
                             defer.resolve(result);
                         })
                         return defer.promise;
-                    };
+                    }());
                     return obj
                 }
             };
+           
 
             this.PersenalSummary = PostQuery('/management/statistics/offline-line/logs');
             this.test2 = PostQuerySingle('');
+            
         })
         .controller('IsLoadingController', function ($timeout, $scope, queryService) {
             this.$onInit = function () {
                 $scope.query();
                 $scope.queryUsers();
             }
+            var params;
 
             var test = queryService.PersenalSummary;
-            var test2 = queryService.test2();
+            // var test2 = queryService.test2();
+
+           
 
             $scope.users = test();
 
-            $scope.query = () => {               
-                test2().then(d => console.log(d));
+            $scope.query = () => {
+                queryService.test2(1122)
+                .then(function(d){
+                    console.log(d)
+                });
             };
 
             $scope.queryUsers = () => {
@@ -99,7 +108,9 @@
                     $scope.users.list = data;
                 }).query().then(d => console.log(d));
             };
-            
+
+
+
             // Promise.all([promise2.query(),$scope.users.query()])
             // .then(result=>{console.log(result)})
 
