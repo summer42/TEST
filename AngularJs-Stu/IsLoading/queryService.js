@@ -76,7 +76,7 @@
                     return obj
                 }
             };
-            //
+
             var Post = function (url) {
                 return function (param, fn) {
                     var defer = $q.defer();
@@ -92,6 +92,29 @@
                     }());
                 }
             };
+            //develop version,for now...
+            var Post = function (url) {
+                return function (param, fn) {
+                    var foo = fn || {};
+                    var defer = $q.defer();
+                    foo.isLoading = false;
+                    return (function () {
+                        foo.isLoading = true;
+                        $http.post(url, param)
+                            .then(function (result) {
+                                foo.isLoading = false;
+                                foo = null;
+                                const { data, error } = result;
+                                if (error != null) {
+                                    return defer.reject(error);
+                                }
+                                return defer.resolve(data);
+                            })
+                        return defer.promise;
+                    }());
+                }
+            };
+
 
             this.users = Post('/manage/business/businessUserQuery');
 
@@ -115,7 +138,7 @@
             $scope.users = test();
 
             $scope.query = () => {
-                queryService.test2(1122)
+                queryService.users(1122, $scope.query)
                     .then(function (d) {
                         console.log(d)
                     });
