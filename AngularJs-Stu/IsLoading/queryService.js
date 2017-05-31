@@ -93,11 +93,29 @@
                 }
             };
 
+            //
+            var Post2 = function (url) {
+                return function (param) {
+                    var fn = arguments.callee.caller||{};
+                    var defer = $q.defer();
+                    fn.isLoading = false;
+                    return (function () {
+                        fn.isLoading = true;
+                        $http.post(url, param)
+                            .then(function (result) {
+                                fn.isLoading = false;
+                                defer.resolve(result);
+                            })
+                        return defer.promise;
+                    }());
+                }
+            };
+
             this.users = Post('/manage/business/businessUserQuery');
 
 
             this.PersenalSummary = PostQuery('/management/statistics/offline-line/logs');
-            this.test2 = Post('');
+            this.test2 = Post2('');
 
         })
         .controller('IsLoadingController', function ($timeout, $scope, queryService) {
@@ -115,7 +133,7 @@
             $scope.users = test();
 
             $scope.query = () => {
-                queryService.test2(1122,$scope.query)
+                queryService.test2(1122)
                     .then(function (d) {
                         console.log(d)
                     });
