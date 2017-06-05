@@ -79,6 +79,7 @@
             //
             var Post = function (url) {
                 return function (param, fn) {
+                    var fn = fn || arguments.callee.caller || {};
                     var defer = $q.defer();
                     fn.isLoading = false;
                     return (function () {
@@ -86,6 +87,8 @@
                         $http.post(url, param)
                             .then(function (result) {
                                 fn.isLoading = false;
+                                //解除无用的引用
+                                fn = null;
                                 defer.resolve(result);
                             })
                         return defer.promise;
@@ -93,29 +96,13 @@
                 }
             };
 
-            //
-            var Post2 = function (url) {
-                return function (param) {
-                    var fn = arguments.callee.caller||{};
-                    var defer = $q.defer();
-                    fn.isLoading = false;
-                    return (function () {
-                        fn.isLoading = true;
-                        $http.post(url, param)
-                            .then(function (result) {
-                                fn.isLoading = false;
-                                defer.resolve(result);
-                            })
-                        return defer.promise;
-                    }());
-                }
-            };
+
 
             this.users = Post('/manage/business/businessUserQuery');
 
 
             this.PersenalSummary = PostQuery('/management/statistics/offline-line/logs');
-            this.test2 = Post2('');
+            this.test2 = Post('');
 
         })
         .controller('IsLoadingController', function ($timeout, $scope, queryService) {
