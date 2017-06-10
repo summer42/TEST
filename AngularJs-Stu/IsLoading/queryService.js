@@ -1,4 +1,4 @@
-
+'use strict';
 (function (angular) {
     angular.module('test', [])
         .service('queryService', function ($http, $q) {
@@ -79,7 +79,14 @@
             //
             var Post = function (url) {
                 return function (param, fn) {
-                    var fn = fn || arguments.callee.caller || {};
+                    var fn;
+                    try {
+                        fn = fn || arguments.callee.caller || {};
+                    } catch (error) {
+                        fn = fn || {};
+                        console.log("cannot access arguments properties in strict mode ")
+                    }
+
                     var defer = $q.defer();
                     fn.isLoading = false;
                     return (function () {
@@ -101,7 +108,7 @@
             this.users = Post('/manage/business/businessUserQuery');
 
 
-            this.PersenalSummary = PostQuery('/management/statistics/offline-line/logs');
+            // this.PersenalSummary = PostQuery('/management/statistics/offline-line/logs');
             this.test2 = Post('');
 
         })
@@ -112,15 +119,15 @@
             }
             var params;
 
-            var test = queryService.PersenalSummary;
+            // var test = queryService.PersenalSummary;
             // var test2 = queryService.test2();
 
 
 
-            $scope.users = test();
+            // $scope.users = test();
 
             $scope.query = () => {
-                queryService.test2(1122)
+                queryService.test2(1122,$scope.query)
                     .then(function (d) {
                         console.log(d)
                     });
