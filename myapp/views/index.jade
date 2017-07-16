@@ -1,14 +1,11 @@
 extends layout
 
 block content
-  div(ng-app="app")
-    div(ng-controller="testController")
-        h1= title
-        p(ng-bind="text")
-        p Welcome to #{title}|test
-        if 1
-          div(ng-if="!flag")
-            test
+  div  
+    #test
+    #test2
 block scripts
-  script(src='/js/angular.js')
-  script(src='/js/angular-test1.js')
+  script(src="js/react.js")
+  script(src="js/react-dom.js")
+  script(src="https://cdn.bootcss.com/babel-standalone/6.22.1/babel.min.js")
+  script(type="text/babel" src="js/start.js")
