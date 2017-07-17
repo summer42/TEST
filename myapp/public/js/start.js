@@ -87,18 +87,18 @@
     del: function (item) {
       this.props.dataChange(this.props.list.filter(x => x.id != item.id));
     },
-    switchComplate: function (item) {
+    switchComplete: function (item) {
       item.completed = !item.completed;
       this.props.dataChange(this.props.list);
     },
-    displayComplate: function (item) {
+    displayComplete: function (item) {
       return item.completed ? "completed" : ""
     },
     render: function () {
       const dataArrLi = this.props.list.map((x, idx) => (
-        <li key={x.id} className={this.displayComplate(x)}>
+        <li key={x.id} className={this.displayComplete(x)}>
           <div className="view" >
-            <input className="toggle" type="checkbox" onClick={() => this.switchComplate(x)}></input>
+            <input className="toggle" type="checkbox" onClick={() => this.switchComplete(x)}></input>
             {x.showEdit ? <Edit dataChange={this.props.dataChange} list={this.props.list} item={x} /> : null}
             <label className={this.display(x, "label")} onDoubleClick={() => this.edit(x)}>{x.text}</label>
             <button className="destroy" onClick={() => this.del(x)}></button>
@@ -112,18 +112,22 @@
 
   //底部筛选
   const Footer = React.createClass({
+    clearComplete: function () {
+       dataArr.forEach(x => x.completed = false);
+       this.props.dataChange(dataArr);
+    },
     filterByState: function (type) {
       if (type === "active") {
-        this.props.dataChange(this.props.list.filter(x => !x.completed));
+        this.props.dataChange(dataArr.filter(x => !x.completed));
       }
       if (type === "completed") {
-        this.props.dataChange(this.props.list.filter(x => x.completed));
+        this.props.dataChange(dataArr.filter(x => x.completed));
       }
       if (type === "all") {
-        this.props.dataChange(this.props.list);
+        this.props.dataChange(dataArr);
       }
-      else { 
-        return 
+      else {
+        return
       }
     },
     render: function () {
@@ -133,16 +137,16 @@
           </span>
           <ul className="filters">
             <li>
-              <a className="selected all" onClick={this.filterByState("all")} href="#/">All</a>
+              <a className="selected all" onClick={() => this.filterByState("all")} href="#/">All</a>
             </li>
             <li>
-              <a className="selected all" onClick={this.filterByState("active")} href="#/active">Active</a>
+              <a className="selected all" onClick={() => this.filterByState("active")} href="#/active">Active</a>
             </li>
             <li>
-              <a className="selected all" onClick={this.filterByState("completed")} href="#/completed">Completed</a>
+              <a className="selected all" onClick={() => this.filterByState("completed")} href="#/completed">Completed</a>
             </li>
           </ul>
-          <button className="clear-completed none" >Clear completed</button>
+          <button className="clear-completed none" onClick={ this.clearComplete }>Clear completed</button>
         </footer>
       )
     }
