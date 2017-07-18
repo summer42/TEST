@@ -76,6 +76,12 @@
     componentWillReceiveProps: function (nextProps) {
       this.setState(nextProps)
     },
+    componentDidMount:() => {
+      console.log("mounted")
+    },
+    componentWillUnmount: () => {
+      console.log("unmounted");      
+    },
     cancelEdit: function () {
       this.state.list.find(x => x.id == this.props.item.id).showEdit = false;
       this.props.dataChange(this.state.list);
@@ -102,7 +108,7 @@
     },
     render: function () {
       return (
-        <input type="text" className="input_edit none" defaultValue={this.props.item.text} onKeyUp={this.eidtItem} ref="editItemInput" onBlur={this.cancelEdit}></input>
+        <input type="text" className="input_edit none" autoFocus="autofocus" defaultValue={this.props.item.text} onKeyUp={this.eidtItem} ref="editItemInput" onBlur={this.cancelEdit}></input>
       )
     }
   });
@@ -226,16 +232,25 @@
         id: 0
       }
     },
-    componentWillReceiveProps: function (nextProps) {
-      console.log(nextProps, 'RootContainer')
-      this.setState({ list: nextProps });
-    },
     changeList: function (innerArr) {
       this.setState({
         list: innerArr,
         id: innerArr.length + this.state.id
       })
     },
+    shouldComponentUpdate: (nextProps, nextState) => {
+      console.log(nextProps, nextState);
+      // if (nextState.list[nextState.list.length - 1].text === "dont render") {
+      //   return false
+      // }
+      return true
+    },
+    componentWillUpdate: (nextProps, nextState) => {
+      console.log(nextProps, nextState);
+
+      return false
+    },
+   
     render: function () {
       return (
         <section className="todoapp">
