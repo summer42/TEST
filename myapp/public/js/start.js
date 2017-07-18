@@ -8,7 +8,11 @@
 
   //初始待办项列表
   let dataArr = [];
+  if (window.localStorage.dataJSON) {
+    dataArr = JSON.parse(window.localStorage.dataJSON)
+  }
   dataArr.type = '';
+
   //初始id
   let id = dataArr.length || 0;
 
@@ -33,6 +37,7 @@
       }
     }
   }
+
   //新建待办项
   const Entrance = React.createClass({
     confirmInput: function (e) {
@@ -45,6 +50,7 @@
           showEdit: false,
           completed: false
         });
+        window.localStorage.dataJSON = JSON.stringify(dataArr);
         this.refs.entranceInput.value = "";
         filterFuncs.bind(this)()[dataArr.type]();
       }
@@ -56,6 +62,7 @@
       else {
         dataArr.forEach(x => x.completed = true);
       }
+      dataArr.type = '';
       this.props.dataChange(dataArr);
     },
     render: function () {
@@ -75,8 +82,8 @@
     //   this.refs.editItemInput.value = this.props.item.text;
     // },
     cancelEdit: function () {
-      this.props.item.showEdit = false;
-      this.props.dataChange(this.props.list);
+      dataArr.find(x => x.id == this.props.item.id).showEdit = false;
+      this.props.dataChange(dataArr);
     },
     eidtItem: function (e) {
       let value = this.refs.editItemInput.value;
@@ -113,11 +120,16 @@
       }
     },
     edit: function (item) {
-      item.showEdit = true;
-      this.props.dataChange(this.props.list);
+      if (!item.completed) {
+        item.showEdit = true;
+        this.props.dataChange(this.props.list);
+      }
+
     },
     del: function (item) {
-      this.props.dataChange(dataArr.filter(x => x.id != item.id));
+      dataArr = dataArr.filter(x => x.id != item.id)
+      window.localStorage.dataJSON = JSON.stringify(dataArr);
+      this.props.dataChange(dataArr);
     },
     switchComplete: function (item) {
       item.completed = !item.completed;
