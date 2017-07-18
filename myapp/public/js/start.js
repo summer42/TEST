@@ -7,36 +7,61 @@
   };
 
   //初始待办项列表
-  let dataArr = [
-    { text: '1', id: 0, completed: false },
-    { text: '2', id: 1, completed: false },
-    { text: '3', id: 2, completed: false }
-  ];
-
+  let dataArr = [];
+  dataArr.type = '';
   //初始id
   let id = dataArr.length || 0;
 
+  //筛选规则
+  const filterFuncs = function () {
+    let _this = this;
+    return {
+      "active": function () {
+        _this.props.dataChange(dataArr.filter(x => !x.completed))
+      },
+
+      "completed": function () {
+        _this.props.dataChange(dataArr.filter(x => x.completed))
+      },
+
+      "all": function () {
+        _this.props.dataChange(dataArr)
+      },
+
+      "": function () {
+        _this.props.dataChange(dataArr)
+      }
+    }
+  }
   //新建待办项
   const Entrance = React.createClass({
     confirmInput: function (e) {
-      if (e.keyCode == KEYCODES.Enter) {
-        let value = this.refs.entranceInput.value;
+      let value = this.refs.entranceInput.value;
+      if (e.keyCode == KEYCODES.Enter && value != '') {
         //完整属性
-        this.props.list.push({
+        dataArr.push({
           text: value,
           id: id++,
           showEdit: false,
           completed: false
         });
         this.refs.entranceInput.value = "";
-        // this.setState({ list: list });
-        console.log(this.props.list.map(x => x.text));
-        this.props.dataChange.call(this, this.props.list);
+        filterFuncs.bind(this)()[dataArr.type]();
       }
+    },
+    completeAll: function () {
+      if (dataArr.filter(x => !x.completed).length == 0) {
+        dataArr.forEach(x => x.completed = false);
+      }
+      else {
+        dataArr.forEach(x => x.completed = true);
+      }
+      this.props.dataChange(dataArr);
     },
     render: function () {
       return (
         <header className="header">
+          <input className="toggle-all" onClick={this.completeAll} type="checkbox"></input>
           <h1>todos</h1>
           <input className="new-todo" ref="entranceInput" onKeyUp={this.confirmInput} placeholder="What needs to be done?" autoFocus></input>
         </header>
@@ -54,11 +79,18 @@
       this.props.dataChange(this.props.list);
     },
     eidtItem: function (e) {
-      if (e.keyCode == KEYCODES.Enter) {
-        let value = this.refs.editItemInput.value;
-        let preItem = this.props.list.find(x => x.id == this.props.item.id);
+      let value = this.refs.editItemInput.value;
+      if (e.keyCode == KEYCODES.Enter && value != '') {
+        let preItem = dataArr.find(x => x.id == this.props.item.id);
         preItem.text = this.refs.editItemInput.value;
-        console.log(this.props.list.map(x => x.text));
+        console.log(dataArr.map(x => x.text));
+        this.refs.editItemInput.value = "";
+        //脱离编辑状态
+        this.props.item.showEdit = false;
+        //同步到最外层组件
+        filterFuncs.bind(this)()[dataArr.type]();
+      }
+      if (e.keyCode == KEYCODES.ESC) {
         this.refs.editItemInput.value = "";
         //脱离编辑状态
         this.props.item.showEdit = false;
@@ -85,11 +117,13 @@
       this.props.dataChange(this.props.list);
     },
     del: function (item) {
-      this.props.dataChange(this.props.list.filter(x => x.id != item.id));
+      this.props.dataChange(dataArr.filter(x => x.id != item.id));
     },
     switchComplete: function (item) {
       item.completed = !item.completed;
-      this.props.dataChange(this.props.list);
+      dataArr.find(x => x.id == item.id).completed = item.completed;
+      //同步到最外层组件
+      filterFuncs.bind(this)()[dataArr.type]();
     },
     displayComplete: function (item) {
       return item.completed ? "completed" : ""
@@ -112,41 +146,37 @@
 
   //底部筛选
   const Footer = React.createClass({
+    displayState: function (btnType) {
+      if (btnType == dataArr.type) {
+        return "selected"
+      }
+    },
     clearComplete: function () {
-       dataArr.forEach(x => x.completed = false);
-       this.props.dataChange(dataArr);
+      dataArr.forEach(x => x.completed = false);
+      dataArr.type = '';
+      this.props.dataChange(dataArr);
     },
     filterByState: function (type) {
-      if (type === "active") {
-        this.props.dataChange(dataArr.filter(x => !x.completed));
-      }
-      if (type === "completed") {
-        this.props.dataChange(dataArr.filter(x => x.completed));
-      }
-      if (type === "all") {
-        this.props.dataChange(dataArr);
-      }
-      else {
-        return
-      }
+      dataArr.type = type;
+      filterFuncs.bind(this)()[type]();
     },
     render: function () {
       return (
         <footer className="footer">
-          <span className="todo-count"> <strong>{this.props.list.filter(x => !x.completed).length || 0}</strong>
+          <span className="todo-count"> <strong>{dataArr.filter(x => !x.completed).length || 0}</strong>
           </span>
           <ul className="filters">
             <li>
-              <a className="selected all" onClick={() => this.filterByState("all")} href="#/">All</a>
+              <a className="all" className={this.displayState("all")} onClick={() => this.filterByState("all")} href="#/">All</a>
             </li>
             <li>
-              <a className="selected all" onClick={() => this.filterByState("active")} href="#/active">Active</a>
+              <a className="all" className={this.displayState("active")} onClick={() => this.filterByState("active")} href="#/active">Active</a>
             </li>
             <li>
-              <a className="selected all" onClick={() => this.filterByState("completed")} href="#/completed">Completed</a>
+              <a className="all" className={this.displayState("completed")} onClick={() => this.filterByState("completed")} href="#/completed">Completed</a>
             </li>
           </ul>
-          <button className="clear-completed none" onClick={ this.clearComplete }>Clear completed</button>
+          <button className="clear-completed none" onClick={this.clearComplete}>Clear completed</button>
         </footer>
       )
     }
@@ -169,7 +199,7 @@
         <section className="todoapp">
           <Entrance list={this.state.list} dataChange={this.changeList} />
           <section className="main">
-            <input className="toggle-all" type="checkbox"></input>
+
             <label htmlFor="toggle-all">Mark all as complete</label>
             <List list={this.state.list} dataChange={this.changeList}></List>
           </section>
