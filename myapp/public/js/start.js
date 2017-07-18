@@ -8,9 +8,9 @@
 
   //初始待办项列表
   let dataArr = [];
-  if (window.localStorage.dataJSON) {
-    dataArr = JSON.parse(window.localStorage.dataJSON)
-  }
+  // if (window.localStorage.dataJSON) {
+  //   dataArr = JSON.parse(window.localStorage.dataJSON)
+  // }
   dataArr.type = '';
 
   //初始id
@@ -40,17 +40,20 @@
 
   //新建待办项
   const Entrance = React.createClass({
+    componentWillReceiveProps:function(nextProps){
+      console.log(nextProps)
+    },
     confirmInput: function (e) {
       let value = this.refs.entranceInput.value;
       if (e.keyCode == KEYCODES.Enter && value != '') {
         //完整属性
         dataArr.push({
           text: value,
-          id: id++,
+          id: ++id,
           showEdit: false,
           completed: false
         });
-        window.localStorage.dataJSON = JSON.stringify(dataArr);
+        // window.localStorage.dataJSON = JSON.stringify(dataArr);
         this.refs.entranceInput.value = "";
         filterFuncs.bind(this)()[dataArr.type]();
       }
@@ -128,7 +131,7 @@
     },
     del: function (item) {
       dataArr = dataArr.filter(x => x.id != item.id)
-      window.localStorage.dataJSON = JSON.stringify(dataArr);
+      // window.localStorage.dataJSON = JSON.stringify(dataArr);
       this.props.dataChange(dataArr);
     },
     switchComplete: function (item) {
@@ -211,7 +214,6 @@
         <section className="todoapp">
           <Entrance list={this.state.list} dataChange={this.changeList} />
           <section className="main">
-
             <label htmlFor="toggle-all">Mark all as complete</label>
             <List list={this.state.list} dataChange={this.changeList}></List>
           </section>
