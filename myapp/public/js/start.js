@@ -7,66 +7,53 @@
   };
 
   //初始待办项列表
-  let dataArr = [];
+  // let this.state.list = [];
   // if (window.localStorage.dataJSON) {
-  //   dataArr = JSON.parse(window.localStorage.dataJSON)
+  //   this.state.list = JSON.parse(window.localStorage.dataJSON)
   // }
-  dataArr.type = '';
+  // this.state.list.type = '';
 
   //初始id
-  let id = dataArr.length || 0;
+  // let id = this.state.list.length || 0;
 
-  //筛选规则
-  const filterFuncs = function () {
-    let _this = this;
-    return {
-      "active": function () {
-        _this.props.dataChange(dataArr.filter(x => !x.completed))
-      },
 
-      "completed": function () {
-        _this.props.dataChange(dataArr.filter(x => x.completed))
-      },
-
-      "all": function () {
-        _this.props.dataChange(dataArr)
-      },
-
-      "": function () {
-        _this.props.dataChange(dataArr)
-      }
-    }
-  }
 
   //新建待办项
   const Entrance = React.createClass({
-    componentWillReceiveProps:function(nextProps){
-      console.log(nextProps)
+    getInitialState: function () {
+      return {
+        list: this.props.list,
+        id: this.props.id
+      }
+    },
+    componentWillReceiveProps: function (nextProps) {
+      console.log(nextProps, "Entrance")
+      this.setState(nextProps);
     },
     confirmInput: function (e) {
       let value = this.refs.entranceInput.value;
       if (e.keyCode == KEYCODES.Enter && value != '') {
         //完整属性
-        dataArr.push({
+        this.state.list.push({
           text: value,
-          id: ++id,
+          id: ++this.state.id,
           showEdit: false,
           completed: false
         });
-        // window.localStorage.dataJSON = JSON.stringify(dataArr);
+        // window.localStorage.dataJSON = JSON.stringify(this.state.list);
         this.refs.entranceInput.value = "";
-        filterFuncs.bind(this)()[dataArr.type]();
+        this.props.dataChange(this.state.list);
       }
     },
     completeAll: function () {
-      if (dataArr.filter(x => !x.completed).length == 0) {
-        dataArr.forEach(x => x.completed = false);
+      if (this.state.list.filter(x => !x.completed).length == 0) {
+        this.state.list.forEach(x => x.completed = false);
       }
       else {
-        dataArr.forEach(x => x.completed = true);
+        this.state.list.forEach(x => x.completed = true);
       }
-      dataArr.type = '';
-      this.props.dataChange(dataArr);
+      this.state.list.type = '';
+      this.props.dataChange(this.state.list);
     },
     render: function () {
       return (
@@ -81,24 +68,29 @@
 
   //编辑待办项
   const Edit = React.createClass({
-    // getInitialState:function(){
-    //   this.refs.editItemInput.value = this.props.item.text;
-    // },
+    getInitialState: function () {
+      return {
+        list: this.props.list
+      }
+    },
+    componentWillReceiveProps: function (nextProps) {
+      this.setState(nextProps)
+    },
     cancelEdit: function () {
-      dataArr.find(x => x.id == this.props.item.id).showEdit = false;
-      this.props.dataChange(dataArr);
+      this.state.list.find(x => x.id == this.props.item.id).showEdit = false;
+      this.props.dataChange(this.state.list);
     },
     eidtItem: function (e) {
       let value = this.refs.editItemInput.value;
       if (e.keyCode == KEYCODES.Enter && value != '') {
-        let preItem = dataArr.find(x => x.id == this.props.item.id);
+        let preItem = this.state.list.find(x => x.id == this.props.item.id);
         preItem.text = this.refs.editItemInput.value;
-        console.log(dataArr.map(x => x.text));
+        console.log(this.state.list.map(x => x.text));
         this.refs.editItemInput.value = "";
         //脱离编辑状态
         this.props.item.showEdit = false;
         //同步到最外层组件
-        filterFuncs.bind(this)()[dataArr.type]();
+        this.props.dataChange(this.state.list);
       }
       if (e.keyCode == KEYCODES.ESC) {
         this.refs.editItemInput.value = "";
@@ -117,6 +109,14 @@
 
   //待办项列表
   const List = React.createClass({
+    getInitialState: function () {
+      return {
+        list: this.props.list
+      }
+    },
+    componentWillReceiveProps: function (nextProps) {
+      this.setState(nextProps)
+    },
     display: function (item, type) {
       if (type === "label") {
         return item.showEdit ? "hide" : ""
@@ -127,24 +127,35 @@
         item.showEdit = true;
         this.props.dataChange(this.props.list);
       }
-
     },
     del: function (item) {
-      dataArr = dataArr.filter(x => x.id != item.id)
-      // window.localStorage.dataJSON = JSON.stringify(dataArr);
-      this.props.dataChange(dataArr);
+      this.state.list = this.state.list.filter(x => x.id != item.id)
+      // window.localStorage.dataJSON = JSON.stringify(this.state.list);
+      this.props.dataChange(this.state.list);
     },
     switchComplete: function (item) {
       item.completed = !item.completed;
-      dataArr.find(x => x.id == item.id).completed = item.completed;
+      this.state.list.find(x => {
+        return x.id == item.id
+      }).completed = item.completed;
       //同步到最外层组件
-      filterFuncs.bind(this)()[dataArr.type]();
+      this.props.dataChange(this.state.list);
     },
     displayComplete: function (item) {
       return item.completed ? "completed" : ""
     },
     render: function () {
-      const dataArrLi = this.props.list.map((x, idx) => (
+      const arrLi = this.props.list.filter(x => {
+        if (this.props.list.type === "active") {
+          return !x.completed
+        }
+        if (this.props.list.type === "completed") {
+          return x.completed
+        }
+        else {
+          return true
+        }
+      }).map((x, idx) => (
         <li key={x.id} className={this.displayComplete(x)}>
           <div className="view" >
             <input className="toggle" type="checkbox" onClick={() => this.switchComplete(x)}></input>
@@ -155,30 +166,38 @@
           <input className="edit" defaultValue="Rule the web"></input>
         </li>
       ))
-      return <ul className="todo-list">{dataArrLi}</ul>
+      return <ul className="todo-list">{arrLi}</ul>
     }
   });
 
   //底部筛选
   const Footer = React.createClass({
+    getInitialState: function () {
+      return {
+        list: this.props.list
+      }
+    },
+    componentWillReceiveProps: function (nextProps) {
+      this.setState(nextProps)
+    },
     displayState: function (btnType) {
-      if (btnType == dataArr.type) {
+      if (btnType == this.state.list.type) {
         return "selected"
       }
     },
     clearComplete: function () {
-      dataArr.forEach(x => x.completed = false);
-      dataArr.type = '';
-      this.props.dataChange(dataArr);
+      this.state.list.forEach(x => x.completed = false);
+      this.state.list.type = '';
+      this.props.dataChange(this.state.list);
     },
     filterByState: function (type) {
-      dataArr.type = type;
-      filterFuncs.bind(this)()[type]();
+      this.state.list.type = type;
+      this.props.dataChange(this.state.list);
     },
     render: function () {
       return (
         <footer className="footer">
-          <span className="todo-count"> <strong>{dataArr.filter(x => !x.completed).length || 0}</strong>
+          <span className="todo-count"> <strong>{this.state.list.filter(x => !x.completed).length || 0}</strong>
           </span>
           <ul className="filters">
             <li>
@@ -200,19 +219,27 @@
   //顶级容器
   const RootContainer = React.createClass({
     getInitialState: function () {
+      var arr = [];
+      arr.type = '';
       return {
-        list: dataArr
+        list: arr,
+        id: 0
       }
+    },
+    componentWillReceiveProps: function (nextProps) {
+      console.log(nextProps, 'RootContainer')
+      this.setState({ list: nextProps });
     },
     changeList: function (innerArr) {
       this.setState({
-        list: innerArr
+        list: innerArr,
+        id: innerArr.length + this.state.id
       })
     },
     render: function () {
       return (
         <section className="todoapp">
-          <Entrance list={this.state.list} dataChange={this.changeList} />
+          <Entrance list={this.state.list} id={this.state.id} dataChange={this.changeList} />
           <section className="main">
             <label htmlFor="toggle-all">Mark all as complete</label>
             <List list={this.state.list} dataChange={this.changeList}></List>
