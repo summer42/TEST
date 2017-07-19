@@ -13,7 +13,11 @@
     class FieldInput extends React.Component {
         constructor(props) {
             super(props);
-            this.state = props;
+            const { id, list, dataChange } = props
+            this.state = {
+                id, list, dataChange, warning: false
+            };
+
             // handleFuncs.call(this,this.confirmInput, this._add, this.confirmAdd);
             // this.confirmInput = this.confirmInput.bind(this);
             // this.confirmAdd = this.confirmAdd.bind(this);
@@ -28,12 +32,23 @@
         _add() {
             let input = this.refs.fieldInput;
             if (input.value != '') {
-                this.state.list.unshift({
-                    text: input.value,
-                    id: this.state.id
-                })
-                input.value = "";
-                this.state.dataChange(this.state.list);
+                if (this.state.list.filter(x => x.text == input.value).length == 0) {
+                    this.state.list.unshift({
+                        text: input.value,
+                        id: this.state.id
+                    })
+                    input.value = "";
+                    this.state.dataChange(this.state.list);
+                }
+
+                else {
+                    this.state.warning = true;
+                    this.setState(this.state)
+                    setTimeout(() => {
+                        this.state.warning = false;
+                        this.setState(this.state)
+                    }, 2000)
+                }
             }
         }
 
@@ -48,7 +63,14 @@
             let input = this.refs.fieldInput;
             this._add();
         }
-
+        displayWarning() {
+            if (this.state.warning) {
+                return ""
+            }
+            else {
+                return "hide"
+            }
+        }
         render() {
             return (
                 <div className="field-input-container">
@@ -56,7 +78,8 @@
                         onKeyUp={this.confirmInput.bind(this)}
                         ref="fieldInput" >
                     </input>
-                    <span className="btn" onClick={this.confirmAdd}>添加</span>
+                    <p className={this.displayWarning()} >配置信息已存在</p>
+                    <span className="btn" onClick={this.confirmAdd.bind(this)}>添加</span>
                 </div>
             )
         }
@@ -86,7 +109,7 @@
                     </span>
                 </li>
             ))
-            if (this.state.list&&this.state.list.length > 0) {
+            if (this.state.list && this.state.list.length > 0) {
                 return (
                     <ul className="list-container">
                         {listEle}
@@ -95,7 +118,7 @@
             }
             else {
                 return (
-                    <p style={{textAlign:"center"}}>暂无数据</p>
+                    <p style={{ textAlign: "center" }}>暂无数据</p>
                 )
             }
         }
