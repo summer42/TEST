@@ -63,7 +63,7 @@
             let input = this.refs.fieldInput;
             this._add();
         }
-        displayWarning() {
+        displayWarning() {            
             if (this.state.warning) {
                 return ""
             }
@@ -79,7 +79,7 @@
                         ref="fieldInput" >
                     </input>
                     <p className={this.displayWarning()} >配置信息已存在</p>
-                    <span className="btn" onClick={this.confirmAdd.bind(this)}>添加</span>
+                    <span className="btn" onClick={ () => this.confirmAdd() }>添加</span>
                 </div>
             )
         }
