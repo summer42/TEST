@@ -1,4 +1,38 @@
 (function () {
+    let alt = new Alt();
+
+    const LocationActions = alt.generateActions('addItem', 'delItem', 'updateList');
+
+    class LocationStore {
+        constructor() {
+            this.list = [{
+                text: 'completed',
+                id: 0,
+                completed: true,
+                showEdit: false
+            }];
+            this.list.type = '';
+            this.id = 0;
+            this.bindListeners({
+                handleUpdateList: LocationActions.UPDATE_LIST
+            });
+        }
+
+        handleUpdateList(data) {
+            const {list,id} = data;
+            this.list = list;
+            this.id = id;
+        }
+        getList() {
+            return this.list
+        }
+    };
+
+    const store = alt.createStore(LocationStore, 'LocationStore');
+
+    console.log(store);
+
+    console.log(LocationActions);
 
     //按键代码
     let KEYCODES = {
@@ -6,33 +40,34 @@
         ESC: 27
     };
 
-    //初始待办项列表
-    // let this.state.list = [];
-    // if (window.localStorage.dataJSON) {
-    //   this.state.list = JSON.parse(window.localStorage.dataJSON)
-    // }
-    // this.state.list.type = '';
-
-    //初始id
-    // let id = this.state.list.length || 0;
-
-
-
     //新建待办项
     class Entrance extends React.Component {
         constructor(props) {
             super(props);
-            console.log(this);
             this.state = {
                 list: props.list,
                 id: props.id
             }
             this.confirmInput = this.confirmInput.bind(this);
             this.completeAll = this.completeAll.bind(this);
+            this.onChange = this.onChange.bind(this)
         }
 
-        componentWillReceiveProps(nextProps) {            
+        componentWillReceiveProps(nextProps) {
             this.setState(nextProps);
+        }
+
+        componentDidMount() {
+            console.log("mounted and listenning")
+            store.listen(this.onChange);
+        }
+
+        componentWillUnmount() {
+            LocationStore.unlisten(this.onChange);
+        }
+
+        onChange(state) {
+            this.setState(state);
         }
 
         confirmInput(e) {
@@ -47,12 +82,11 @@
                 });
                 // window.localStorage.dataJSON = JSON.stringify(this.state.list);
                 this.refs.entranceInput.value = "";
-                this.props.dataChange(this.state.list);
+                LocationActions.updateList(this.state);
             }
         }
-       
+
         completeAll() {
-             console.log(this);
             if (this.state.list.filter(x => !x.completed).length == 0) {
                 this.state.list.forEach(x => x.completed = false);
             }
@@ -66,7 +100,7 @@
         render() {
             return (
                 <header className="header">
-                    <input className="toggle-all" onClick={this.completeAll} type="checkbox"></input>
+                    {this.state.list.length > 0 ? <input className="toggle-all" onClick={this.completeAll} type="checkbox"></input> : null}
                     <h1>todos</h1>
                     <input className="new-todo" ref="entranceInput" onKeyUp={this.confirmInput} placeholder="What needs to be done?" autoFocus></input>
                 </header>
@@ -84,12 +118,24 @@
         componentWillReceiveProps: function (nextProps) {
             this.setState(nextProps)
         },
+        componentWillMount: () => {
+            console.log("mounting")
+        },
         componentDidMount: () => {
             console.log("mounted")
+        },
+        shouldComponentUpdate: (nextProps, nextState) => {
+            console.log("should update");
+            return true
+        },
+        componentWillUpdate: (nextProps, nextState) => {
+            console.log("updating");
+            return true
         },
         componentWillUnmount: () => {
             console.log("unmounted");
         },
+
         cancelEdit: function () {
             this.state.list.find(x => x.id == this.props.item.id).showEdit = false;
             this.props.dataChange(this.state.list);
@@ -122,43 +168,69 @@
     });
 
     //待办项列表
-    const List = React.createClass({
-        getInitialState: function () {
-            return {
-                list: this.props.list
+    class List extends React.Component {
+        constructor(props) {
+            super(props);
+            this.state = {
+                list: props.list,
+                id: props.id
             }
-        },
-        componentWillReceiveProps: function (nextProps) {
+        }
+        componentWillReceiveProps(nextProps) {
             this.setState(nextProps)
-        },
-        display: function (item, type) {
+        }
+        componentWillMount() {
+            console.log("'List' mounting")
+        }
+        componentDidMount() {
+            console.log("'List' mounted")
+        }
+        shouldComponentUpdate(nextProps, nextState) {
+            console.log("'List' should update");
+            return true
+        }
+        componentWillUpdate(nextProps, nextState) {
+            console.log("'List' updating");
+            return true
+        }
+        componentWillUnmount() {
+            console.log("'List' unmounted");
+        }
+
+        cb(data) {
+            this.setState({
+                list: list
+            })
+        }
+
+        display(item, type) {
             if (type === "label") {
                 return item.showEdit ? "hide" : ""
             }
-        },
-        edit: function (item) {
+        }
+        edit(item) {
             if (!item.completed) {
                 item.showEdit = true;
                 this.props.dataChange(this.props.list);
             }
-        },
-        del: function (item) {
+        }
+        del(item) {
             this.state.list = this.state.list.filter(x => x.id != item.id)
             // window.localStorage.dataJSON = JSON.stringify(this.state.list);
             this.props.dataChange(this.state.list);
-        },
-        switchComplete: function (item) {
+        }
+        switchComplete(item) {
             item.completed = !item.completed;
             this.state.list.find(x => {
                 return x.id == item.id
             }).completed = item.completed;
             //同步到最外层组件
             this.props.dataChange(this.state.list);
-        },
-        displayComplete: function (item) {
+        }
+        displayComplete(item) {
             return item.completed ? "completed" : ""
-        },
-        render: function () {
+        }
+        render() {
             const arrLi = this.props.list.filter(x => {
                 if (this.props.list.type === "active") {
                     return !x.completed
@@ -182,7 +254,14 @@
             ))
             return <ul className="todo-list">{arrLi}</ul>
         }
-    });
+    };
+
+    List.defaultProps = {
+        list: [{
+            text: "已完成", id: 1, showEdit: false, completed: true
+        }],
+        id: 1
+    };
 
     //底部筛选
     const Footer = React.createClass({
@@ -231,47 +310,48 @@
     });
 
     //顶级容器
-    const RootContainer = React.createClass({
-        getInitialState: function () {
-            var arr = [];
-            arr.type = '';
-            return {
-                list: arr,
+    class RootContainer extends React.Component {
+        constructor(props) {
+            super(props);
+            this.state = {
+                list: store.state.list,
                 id: 0
             }
-        },
-        changeList: function (innerArr) {
+            this.changeList = this.changeList.bind(this);
+            this.onChange = this.onChange.bind(this);
+        }
+        changeList(innerArr) {
             this.setState({
                 list: innerArr,
                 id: innerArr.length + this.state.id
             })
-        },
-        shouldComponentUpdate: (nextProps, nextState) => {
-            console.log(nextProps, nextState);
-            // if (nextState.list[nextState.list.length - 1].text === "dont render") {
-            //   return false
-            // }
-            return true
-        },
-        componentWillUpdate: (nextProps, nextState) => {
-            console.log(nextProps, nextState);
+        }
+        componentDidMount() {
+            console.log("mounted and listenning")
+            store.listen(this.onChange);
+        }
 
-            return false
-        },
-
-        render: function () {
+        componentWillUnmount() {
+            LocationStore.unlisten(this.onChange);
+        }
+        onChange(state){
+            this.setState(state);
+        }
+        render() {
             return (
                 <section className="todoapp">
                     <Entrance list={this.state.list} id={this.state.id} dataChange={this.changeList} />
                     <section className="main">
                         <label htmlFor="toggle-all">Mark all as complete</label>
-                        <List list={this.state.list} dataChange={this.changeList}></List>
+                        <List list={this.state.list} ref={cb => this.foo = cb} dataChange={this.changeList}></List>
+                        {/* <List dataChange={this.changeList}></List> */}
                     </section>
-                    <Footer list={this.state.list} dataChange={this.changeList}></Footer>
+                    {this.state.list.length > 0 ? <Footer list={this.state.list} dataChange={this.changeList}></Footer> : null}
+
                 </section>
             );
         }
-    });
+    };
 
     //渲染页面
     ReactDOM.render(

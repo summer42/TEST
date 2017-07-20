@@ -6,18 +6,6 @@
     ESC: 27
   };
 
-  //初始待办项列表
-  // let this.state.list = [];
-  // if (window.localStorage.dataJSON) {
-  //   this.state.list = JSON.parse(window.localStorage.dataJSON)
-  // }
-  // this.state.list.type = '';
-
-  //初始id
-  // let id = this.state.list.length || 0;
-
-
-
   //新建待办项
   const Entrance = React.createClass({
     getInitialState: function () {
@@ -58,7 +46,7 @@
     render: function () {
       return (
         <header className="header">
-          <input className="toggle-all" onClick={this.completeAll} type="checkbox"></input>
+          {this.state.list.length > 0 ? <input className="toggle-all" onClick={this.completeAll} type="checkbox"></input> : null}
           <h1>todos</h1>
           <input className="new-todo" ref="entranceInput" onKeyUp={this.confirmInput} placeholder="What needs to be done?" autoFocus></input>
         </header>
@@ -76,39 +64,52 @@
     componentWillReceiveProps: function (nextProps) {
       this.setState(nextProps)
     },
-    componentDidMount:() => {
+    componentDidMount: () => {
       console.log("mounted")
     },
     componentWillUnmount: () => {
-      console.log("unmounted");      
+      console.log("unmounted");
     },
-    cancelEdit: function () {
+    addItem: function () {
+      let value = this.refs.editItemInput.value;
       this.state.list.find(x => x.id == this.props.item.id).showEdit = false;
+      this.state.list.find(x => x.id == this.props.item.id).text = value;
+      if (value == "") {
+        this.state.list = this.state.list.filter(x => x.id != this.props.item.id);
+      }
+      this.refs.editItemInput.value = "";
       this.props.dataChange(this.state.list);
     },
     eidtItem: function (e) {
       let value = this.refs.editItemInput.value;
-      if (e.keyCode == KEYCODES.Enter && value != '') {
-        let preItem = this.state.list.find(x => x.id == this.props.item.id);
-        preItem.text = this.refs.editItemInput.value;
-        console.log(this.state.list.map(x => x.text));
+      const leftEdit = () => {
         this.refs.editItemInput.value = "";
         //脱离编辑状态
         this.props.item.showEdit = false;
         //同步到最外层组件
         this.props.dataChange(this.state.list);
       }
+      if (e.keyCode == KEYCODES.Enter && value != '') {
+        let preItem = this.state.list.find(x => x.id == this.props.item.id);
+        preItem.text = this.refs.editItemInput.value;
+        leftEdit()
+      }
+      if (e.keyCode == KEYCODES.Enter && value == "") {
+        this.state.list = this.state.list.filter(x => x.id != this.props.item.id);
+        leftEdit()
+      }
       if (e.keyCode == KEYCODES.ESC) {
-        this.refs.editItemInput.value = "";
-        //脱离编辑状态
-        this.props.item.showEdit = false;
-        //同步到最外层组件
-        this.props.dataChange(this.props.list);
+        leftEdit()
       }
     },
     render: function () {
       return (
-        <input type="text" className="input_edit none" autoFocus="autofocus" defaultValue={this.props.item.text} onKeyUp={this.eidtItem} ref="editItemInput" onBlur={this.cancelEdit}></input>
+        <input type="text" className="input_edit none"
+          autoFocus="autofocus"
+          ref="editItemInput"
+          defaultValue={this.props.item.text}
+          onKeyUp={this.eidtItem}
+          onBlur={this.addItem}></input>
       )
     }
   });
@@ -238,19 +239,6 @@
         id: innerArr.length + this.state.id
       })
     },
-    shouldComponentUpdate: (nextProps, nextState) => {
-      console.log(nextProps, nextState);
-      // if (nextState.list[nextState.list.length - 1].text === "dont render") {
-      //   return false
-      // }
-      return true
-    },
-    componentWillUpdate: (nextProps, nextState) => {
-      console.log(nextProps, nextState);
-
-      return false
-    },
-   
     render: function () {
       return (
         <section className="todoapp">
@@ -259,7 +247,7 @@
             <label htmlFor="toggle-all">Mark all as complete</label>
             <List list={this.state.list} dataChange={this.changeList}></List>
           </section>
-          <Footer list={this.state.list} dataChange={this.changeList}></Footer>
+          {this.state.list.length > 0 ? <Footer list={this.state.list} dataChange={this.changeList}></Footer> : null}
         </section>
       );
     }
