@@ -1,7 +1,7 @@
 (function () {
     let alt = new Alt();
 
-    const LocationActions = alt.generateActions('addItem', 'delItem', 'updateList');
+    const LocationActions = alt.generateActions('updateList');
 
     class LocationStore {
         constructor() {
@@ -19,9 +19,9 @@
         }
 
         handleUpdateList(data) {
-            const {list,id} = data;
+            const { list, id } = data;
             this.list = list;
-            this.id = id;
+            this.id = list.length>0?list[list.length - 1].id + 1:0;
         }
         getList() {
             return this.list
@@ -30,9 +30,7 @@
 
     const store = alt.createStore(LocationStore, 'LocationStore');
 
-    console.log(store);
 
-    console.log(LocationActions);
 
     //按键代码
     let KEYCODES = {
@@ -94,7 +92,7 @@
                 this.state.list.forEach(x => x.completed = true);
             }
             this.state.list.type = '';
-            this.props.dataChange(this.state.list);
+            LocationActions.updateList(this.state);
         }
 
         render() {
@@ -138,29 +136,27 @@
 
         cancelEdit: function () {
             this.state.list.find(x => x.id == this.props.item.id).showEdit = false;
-            this.props.dataChange(this.state.list);
+            LocationActions.updateList(this.state);
         },
-        eidtItem: function (e) {
+        eidtItem: function (e) {            
             let value = this.refs.editItemInput.value;
+            const confirm = () => {
+                this.refs.editItemInput.value = "";
+                //脱离编辑状态
+                this.props.item.showEdit = false;
+                //同步到最外层组件
+                LocationActions.updateList(this.state);
+            }
             if (e.keyCode == KEYCODES.Enter && value != '') {
                 let preItem = this.state.list.find(x => x.id == this.props.item.id);
                 preItem.text = this.refs.editItemInput.value;
-                console.log(this.state.list.map(x => x.text));
-                this.refs.editItemInput.value = "";
-                //脱离编辑状态
-                this.props.item.showEdit = false;
-                //同步到最外层组件
-                this.props.dataChange(this.state.list);
+                confirm();
             }
             if (e.keyCode == KEYCODES.ESC) {
-                this.refs.editItemInput.value = "";
-                //脱离编辑状态
-                this.props.item.showEdit = false;
-                //同步到最外层组件
-                this.props.dataChange(this.props.list);
+                confirm();
             }
         },
-        render: function () {
+        render: function () {            
             return (
                 <input type="text" className="input_edit none" autoFocus="autofocus" defaultValue={this.props.item.text} onKeyUp={this.eidtItem} ref="editItemInput" onBlur={this.cancelEdit}></input>
             )
@@ -175,6 +171,7 @@
                 list: props.list,
                 id: props.id
             }
+            this.cb = this.cb.bind(this);
         }
         componentWillReceiveProps(nextProps) {
             this.setState(nextProps)
@@ -197,10 +194,8 @@
             console.log("'List' unmounted");
         }
 
-        cb(data) {
-            this.setState({
-                list: list
-            })
+        cb() {
+            return this;
         }
 
         display(item, type) {
@@ -211,13 +206,13 @@
         edit(item) {
             if (!item.completed) {
                 item.showEdit = true;
-                this.props.dataChange(this.props.list);
+                LocationActions.updateList(this.state);
             }
         }
         del(item) {
             this.state.list = this.state.list.filter(x => x.id != item.id)
             // window.localStorage.dataJSON = JSON.stringify(this.state.list);
-            this.props.dataChange(this.state.list);
+            LocationActions.updateList(this.state);
         }
         switchComplete(item) {
             item.completed = !item.completed;
@@ -225,12 +220,13 @@
                 return x.id == item.id
             }).completed = item.completed;
             //同步到最外层组件
-            this.props.dataChange(this.state.list);
+            LocationActions.updateList(this.state);
         }
         displayComplete(item) {
             return item.completed ? "completed" : ""
         }
         render() {
+            console.log("'List' rendering");
             const arrLi = this.props.list.filter(x => {
                 if (this.props.list.type === "active") {
                     return !x.completed
@@ -245,7 +241,7 @@
                 <li key={x.id} className={this.displayComplete(x)}>
                     <div className="view" >
                         <input className="toggle" type="checkbox" onClick={() => this.switchComplete(x)}></input>
-                        {x.showEdit ? <Edit dataChange={this.props.dataChange} list={this.props.list} item={x} /> : null}
+                        {x.showEdit ? <Edit list={this.props.list} item={x} /> : null}
                         <label className={this.display(x, "label")} onDoubleClick={() => this.edit(x)}>{x.text}</label>
                         <button className="destroy" onClick={() => this.del(x)}></button>
                     </div>
@@ -281,11 +277,11 @@
         clearComplete: function () {
             this.state.list.forEach(x => x.completed = false);
             this.state.list.type = '';
-            this.props.dataChange(this.state.list);
+            LocationActions.updateList(this.state);
         },
-        filterByState: function (type) {
+        filterByState: function (type) {            
             this.state.list.type = type;
-            this.props.dataChange(this.state.list);
+            LocationActions.updateList(this.state);
         },
         render: function () {
             return (
@@ -329,24 +325,25 @@
         componentDidMount() {
             console.log("mounted and listenning")
             store.listen(this.onChange);
+            console.log("from parent",this.foo)
         }
 
         componentWillUnmount() {
             LocationStore.unlisten(this.onChange);
         }
-        onChange(state){
+        onChange(state) {
             this.setState(state);
         }
         render() {
             return (
                 <section className="todoapp">
-                    <Entrance list={this.state.list} id={this.state.id} dataChange={this.changeList} />
+                    <Entrance list={this.state.list} id={this.state.id} />
                     <section className="main">
                         <label htmlFor="toggle-all">Mark all as complete</label>
-                        <List list={this.state.list} ref={cb => this.foo = cb} dataChange={this.changeList}></List>
-                        {/* <List dataChange={this.changeList}></List> */}
+                        <List list={this.state.list} ref={com => this.foo = com}></List>
+                        {/* <List></List> */}
                     </section>
-                    {this.state.list.length > 0 ? <Footer list={this.state.list} dataChange={this.changeList}></Footer> : null}
+                    {this.state.list.length > 0 ? <Footer list={this.state.list}></Footer> : null}
 
                 </section>
             );
