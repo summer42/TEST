@@ -21,7 +21,7 @@
         handleUpdateList(data) {
             const { list, id } = data;
             this.list = list;
-            this.id = list.length>0?list[list.length - 1].id + 1:0;
+            this.id = list.length > 0 ? list[list.length - 1].id + 1 : 0;
         }
         getList() {
             return this.list
@@ -29,8 +29,6 @@
     };
 
     const store = alt.createStore(LocationStore, 'LocationStore');
-
-
 
     //按键代码
     let KEYCODES = {
@@ -48,7 +46,7 @@
             }
             this.confirmInput = this.confirmInput.bind(this);
             this.completeAll = this.completeAll.bind(this);
-            this.onChange = this.onChange.bind(this)
+            this.onChange = this.onChange.bind(this);
         }
 
         componentWillReceiveProps(nextProps) {
@@ -138,10 +136,10 @@
             this.state.list.find(x => x.id == this.props.item.id).showEdit = false;
             LocationActions.updateList(this.state);
         },
-        eidtItem: function (e) {            
-            let value = this.refs.editItemInput.value;
+        eidtItem: function (e) {
+            let value = this.editItemInput.value;
             const confirm = () => {
-                this.refs.editItemInput.value = "";
+                this.editItemInput.value = "";
                 //脱离编辑状态
                 this.props.item.showEdit = false;
                 //同步到最外层组件
@@ -149,16 +147,22 @@
             }
             if (e.keyCode == KEYCODES.Enter && value != '') {
                 let preItem = this.state.list.find(x => x.id == this.props.item.id);
-                preItem.text = this.refs.editItemInput.value;
+                preItem.text = this.editItemInput.value;
                 confirm();
             }
             if (e.keyCode == KEYCODES.ESC) {
                 confirm();
             }
         },
-        render: function () {            
+        render: function () {
             return (
-                <input type="text" className="input_edit none" autoFocus="autofocus" defaultValue={this.props.item.text} onKeyUp={this.eidtItem} ref="editItemInput" onBlur={this.cancelEdit}></input>
+                <input type="text"
+                    className="input_edit none"
+                    autoFocus="autofocus"
+                    defaultValue={this.props.item.text}
+                    onKeyUp={this.eidtItem}
+                    ref={input => { console.log(this); return this.editItemInput = input }}
+                    onBlur={this.cancelEdit}></input>
             )
         }
     });
@@ -279,7 +283,7 @@
             this.state.list.type = '';
             LocationActions.updateList(this.state);
         },
-        filterByState: function (type) {            
+        filterByState: function (type) {
             this.state.list.type = type;
             LocationActions.updateList(this.state);
         },
@@ -325,7 +329,7 @@
         componentDidMount() {
             console.log("mounted and listenning")
             store.listen(this.onChange);
-            console.log("from parent",this.foo)
+            console.log("from parent", this.foo)
         }
 
         componentWillUnmount() {

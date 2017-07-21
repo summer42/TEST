@@ -9,6 +9,7 @@ var index = require('./routes/index');
 var users = require('./routes/users');
 var todo = require('./routes/todo');
 var field = require('./routes/fieldAdd');
+var form = require('./routes/form');
 
 var app = express();
 
@@ -40,6 +41,7 @@ app.use('/', index);
 app.use('/users', users);
 app.use('/todo',todo);
 app.use('/field',field);
+app.use('/form',form);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -63,8 +65,5 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
-
-
-
 
 module.exports = app;
