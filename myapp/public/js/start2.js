@@ -1,20 +1,102 @@
 (function () {
+
     let alt = new Alt();
 
-    const LocationActions = alt.generateActions('updateList');
+    let mockData = [];
 
+    let services = {
+        query: () => {
+            return new Promise((resolve, reject) => {
+                setTimeout(() => {
+                    resolve({ list: mockData, id: mockData.length })
+                }, 1000)
+            })
+        },
+        add: data => {
+            return new Promise((resolve, reject) => {
+                setTimeout(() => {
+                    mockData = data.list;
+                    resolve({ success: true })
+                }, 0)
+            })
+        }
+    };
+
+
+    function LocationActions() {
+        this.generateActions('updateList', 'errorHandler');
+        this.addItem = function (data) {
+            var that = this;
+            services.add(data)
+                .then(data => {
+                    that.queryData();
+                })
+        }
+        this.queryData = function () {
+            var that = this;
+            return function(dispatch){
+                dispatch();
+                services.query()
+                .then(data => {
+                    that.updateList(data);
+                })
+                .catch(err => {
+                    that.errorHandler(err);
+                })
+            }
+        }
+    };
+
+
+    // class LocationActions {
+    //     addItem(data) {
+    //         return () => {
+    //             services.add(data)
+    //                 .then(data => {
+    //                     this.queryData();
+    //                 })
+    //         }
+
+    //     }
+    //     updateList(data) {
+    //         return data;
+    //     }
+    //     queryData() {
+    //         let that = this;            
+    //         return function (dispatch) {
+    //             dispatch();
+    //             services.query()
+    //                 .then(data => {
+    //                     that.updateList(data);
+    //                 })
+    //                 .catch(err => {
+    //                     that.errorHandler(err);
+    //                 })
+    //         }
+    //     }
+    //     errorHandler(err) {
+    //         return err;
+    //     }
+    // }
+    const actions = alt.createActions(LocationActions);
     class LocationStore {
         constructor() {
-            this.list = [{
-                text: 'completed',
-                id: 0,
-                completed: true,
-                showEdit: false
-            }];
+            this.on('bootstrap', () => {
+            });
+            this.on('snapshot', () => {
+            });
+            this.on('init', () => {
+            });
+            this.on('rollback', () => {
+            });
+
+            this.list = [];
             this.list.type = '';
             this.id = 0;
             this.bindListeners({
-                handleUpdateList: LocationActions.UPDATE_LIST
+                handleUpdateList: actions.UPDATE_LIST,
+                handleFetchLocations: actions.QUERY_DATA,
+                handleAddItem: actions.ADD_ITEM
             });
         }
 
@@ -23,8 +105,21 @@
             this.list = list;
             this.id = list.length > 0 ? list[list.length - 1].id + 1 : 0;
         }
-        getList() {
-            return this.list
+        handleFetchLocations() {
+            this.list = [{
+                text: "isLoading",
+                id: 1,
+                completed: true,
+                showEdit: false
+            }];
+        }
+        handleAddItem() {
+            this.list = [{
+                text: "isAddding",
+                id: 1,
+                completed: true,
+                showEdit: false
+            }];
         }
     };
 
@@ -35,6 +130,7 @@
         Enter: 13,
         ESC: 27
     };
+
 
     //新建待办项
     class Entrance extends React.Component {
@@ -59,7 +155,7 @@
         }
 
         componentWillUnmount() {
-            LocationStore.unlisten(this.onChange);
+            store.unlisten(this.onChange);
         }
 
         onChange(state) {
@@ -78,7 +174,7 @@
                 });
                 // window.localStorage.dataJSON = JSON.stringify(this.state.list);
                 this.refs.entranceInput.value = "";
-                LocationActions.updateList(this.state);
+                actions.addItem(this.state);
             }
         }
 
@@ -90,7 +186,7 @@
                 this.state.list.forEach(x => x.completed = true);
             }
             this.state.list.type = '';
-            LocationActions.updateList(this.state);
+            actions.updateList(this.state);
         }
 
         render() {
@@ -115,26 +211,21 @@
             this.setState(nextProps)
         },
         componentWillMount: () => {
-            console.log("mounting")
         },
         componentDidMount: () => {
-            console.log("mounted")
         },
         shouldComponentUpdate: (nextProps, nextState) => {
-            console.log("should update");
             return true
         },
         componentWillUpdate: (nextProps, nextState) => {
-            console.log("updating");
             return true
         },
         componentWillUnmount: () => {
-            console.log("unmounted");
         },
 
         cancelEdit: function () {
             this.state.list.find(x => x.id == this.props.item.id).showEdit = false;
-            LocationActions.updateList(this.state);
+            actions.updateList(this.state);
         },
         eidtItem: function (e) {
             let value = this.editItemInput.value;
@@ -143,7 +234,7 @@
                 //脱离编辑状态
                 this.props.item.showEdit = false;
                 //同步到最外层组件
-                LocationActions.updateList(this.state);
+                actions.updateList(this.state);
             }
             if (e.keyCode == KEYCODES.Enter && value != '') {
                 let preItem = this.state.list.find(x => x.id == this.props.item.id);
@@ -210,13 +301,13 @@
         edit(item) {
             if (!item.completed) {
                 item.showEdit = true;
-                LocationActions.updateList(this.state);
+                actions.updateList(this.state);
             }
         }
         del(item) {
             this.state.list = this.state.list.filter(x => x.id != item.id)
             // window.localStorage.dataJSON = JSON.stringify(this.state.list);
-            LocationActions.updateList(this.state);
+            actions.updateList(this.state);
         }
         switchComplete(item) {
             item.completed = !item.completed;
@@ -224,7 +315,7 @@
                 return x.id == item.id
             }).completed = item.completed;
             //同步到最外层组件
-            LocationActions.updateList(this.state);
+            actions.updateList(this.state);
         }
         displayComplete(item) {
             return item.completed ? "completed" : ""
@@ -281,11 +372,11 @@
         clearComplete: function () {
             this.state.list.forEach(x => x.completed = false);
             this.state.list.type = '';
-            LocationActions.updateList(this.state);
+            actions.updateList(this.state);
         },
         filterByState: function (type) {
             this.state.list.type = type;
-            LocationActions.updateList(this.state);
+            actions.updateList(this.state);
         },
         render: function () {
             return (
@@ -319,6 +410,7 @@
             }
             this.changeList = this.changeList.bind(this);
             this.onChange = this.onChange.bind(this);
+
         }
         changeList(innerArr) {
             this.setState({
@@ -326,14 +418,15 @@
                 id: innerArr.length + this.state.id
             })
         }
+        query() {
+            actions.queryData(() => { });
+        }
         componentDidMount() {
-            console.log("mounted and listenning")
             store.listen(this.onChange);
-            console.log("from parent", this.foo)
         }
 
         componentWillUnmount() {
-            LocationStore.unlisten(this.onChange);
+            store.unlisten(this.onChange);
         }
         onChange(state) {
             this.setState(state);
@@ -342,6 +435,7 @@
             return (
                 <section className="todoapp">
                     <Entrance list={this.state.list} id={this.state.id} />
+                    {/* <span onClick={ this.query.bind(this)  }>查询</span> */}
                     <section className="main">
                         <label htmlFor="toggle-all">Mark all as complete</label>
                         <List list={this.state.list} ref={com => this.foo = com}></List>
