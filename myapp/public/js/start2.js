@@ -150,7 +150,7 @@
         }
 
         componentDidMount() {
-            console.log("mounted and listenning")
+            // console.log("mounted and listenning")
             store.listen(this.onChange);
         }
 
@@ -208,19 +208,25 @@
             }
         },
         componentWillReceiveProps: function (nextProps) {
+            console.log('"Edit" componentWillReceiveProps')
             this.setState(nextProps)
         },
         componentWillMount: () => {
+            console.log('"Edit" componentWillReceiveProps')
         },
         componentDidMount: () => {
+            console.log('"Edit" componentDidMount')
         },
         shouldComponentUpdate: (nextProps, nextState) => {
+            console.log('"Edit" shouldComponentUpdate')
             return true
         },
         componentWillUpdate: (nextProps, nextState) => {
+            console.log('"Edit" componentWillUpdate')
             return true
         },
         componentWillUnmount: () => {
+            console.log('"Edit" componentWillUnmount')
         },
 
         cancelEdit: function () {
@@ -261,6 +267,7 @@
     //待办项列表
     class List extends React.Component {
         constructor(props) {
+             console.log("'List' initialize")
             super(props);
             this.state = {
                 list: props.list,
@@ -269,24 +276,28 @@
             this.cb = this.cb.bind(this);
         }
         componentWillReceiveProps(nextProps) {
+             console.log("'List' componentWillReceiveProps")
             this.setState(nextProps)
         }
         componentWillMount() {
-            console.log("'List' mounting")
+            console.log("'List' componentWillMount")
         }
         componentDidMount() {
-            console.log("'List' mounted")
+            console.log("'List' componentDidMount")
         }
         shouldComponentUpdate(nextProps, nextState) {
-            console.log("'List' should update");
+            console.log("'List' shouldComponentUpdate");
             return true
         }
         componentWillUpdate(nextProps, nextState) {
-            console.log("'List' updating");
+            console.log("'List' componentWillUpdate");
             return true
         }
+        componentDidUpdate(){
+            console.log("'List' componentDidUpdate");
+        }
         componentWillUnmount() {
-            console.log("'List' unmounted");
+            console.log("'List' componentWillUnmount");
         }
 
         cb() {

@@ -15,7 +15,7 @@
       }
     },
     componentWillReceiveProps: function (nextProps) {
-      console.log(nextProps, "Entrance")
+      // console.log(nextProps, "Entrance")
       this.setState(nextProps);
     },
     confirmInput: function (e) {
@@ -65,10 +65,10 @@
       this.setState(nextProps)
     },
     componentDidMount: () => {
-      console.log("mounted")
+      console.log("'Edit' mounted",arguments)
     },
     componentWillUnmount: () => {
-      console.log("unmounted");
+      console.log("'Edit' unmounted",arguments);
     },
     addItem: function () {
       let value = this.refs.editItemInput.value;
@@ -117,12 +117,34 @@
   //待办项列表
   const List = React.createClass({
     getInitialState: function () {
+      console.log("'List' initialize")
       return {
         list: this.props.list
       }
     },
     componentWillReceiveProps: function (nextProps) {
+      console.log("'List' componentWillReceiveProps")
       this.setState(nextProps)
+    },
+    componentWillMount: function () {
+      console.log("'List' componentWillMount",arguments)
+    },
+    componentDidMount: function () {
+      console.log("'List' componentDidMount",arguments)
+    },
+    shouldComponentUpdate: function (nextProps, nextState) {
+      console.log("'List' shouldComponentUpdate",arguments);
+      return true
+    },
+    componentWillUpdate: function (nextProps, nextState) {
+      console.log("'List' componentWillUpdate",arguments);
+      return false
+    },
+    componentDidUpdate: function () {
+      console.log("'List' componentDidUpdate",arguments);
+    },
+    componentWillUnmount: function () {
+      console.log("'List' componentWillUnmount",arguments);
     },
     display: function (item, type) {
       if (type === "label") {
@@ -152,6 +174,7 @@
       return item.completed ? "completed" : ""
     },
     render: function () {
+      console.log("'List' rendering");
       const arrLi = this.props.list.filter(x => {
         if (this.props.list.type === "active") {
           return !x.completed

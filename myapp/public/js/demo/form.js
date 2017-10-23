@@ -28,7 +28,7 @@
             const value = e.type == "check"?targget.checked:target.value;
             const name = target.name;
             this.setState({                
-                [name]:value
+                value:value
             });
             console.log(this.state)
         }
@@ -46,7 +46,8 @@
                 <form style={{ width: "70%", margin: "50px auto", textAlign: "center" }} onSubmit={this.handleSubmit}>
                     <label htmlFor="">select</label>
                     <input type="text"
-                        value={this.state.select}
+                        value={this.state.value}
+                        onChange={this.handleChange.bind(this)}
                         >
                     </input>
                     <br />
@@ -54,7 +55,7 @@
                     <label htmlFor="">age:<span >{this.state.age}</span></label>
                     <input type="text"
                         name="age"
-                        onChange={this.handleChange.bind(this)}>
+                        onChange={ () => this.handleChange() }>
                     </input>
                     <br />
                     <br />
@@ -66,6 +67,7 @@
                     <br />
                     <br />
                     <select
+                        value={this.state.value}
                         name="select"
                         onChange={this.handleChange.bind(this)}>
                         {options}
