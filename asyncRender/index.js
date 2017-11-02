@@ -23,16 +23,11 @@ const resultHandler = (domIdx, data) => {
                 render(idx, x.data);
                 x.seted = true;
             }
-            return
         }
         else if (resultArr[idx - 1] && resultArr[idx - 1].seted && x.data) {
             render(idx, x.data);
             x.seted = true;
-            return
-        }
-        else {
-            return
-        }
+        }        
     })
 };
 
