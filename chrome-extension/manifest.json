@@ -31,9 +31,8 @@
             ],
             "js": [
                 "dep/jquery.min.js",
-                "dep/md5.min.js",
-                "content.js",
-                "login.js"
+                "dep/md5.min.js",                
+                "content.js"
             ]
         }
     ],

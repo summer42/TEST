@@ -1,10 +1,10 @@
-const loginUrl = "https://ketao.antfact.com/login";
-// const REG = /(^1[3-9]\d{9}$)|(^0\d{2,3}-?\d{5,8}$)/;
-const REG = /(1[3-9]\d{9})|(0\d{2,3}-?\d{5,8})/ig;
+
+const REG = /(^1[3-9]\d{9}$)|(^0\d{2,3}-?\d{5,8}$)/;
+// const REG = /(1[3-9]\d{9})|(0\d{2,3}-?\d{5,8})/ig;
 //缓存chrome.runtime 防止在注入的代码中拿不到
 const Runtime = chrome.runtime;
-const DELAY_TIME = 1200;
-const LOGIN_SUEESS_TIP_DELAY = 300;//登陆成功后的提示停留时间
+const DELAY_TIME = 1100;
+const LOGIN_SUEESS_TIP_DELAY = 1200;//登陆成功后的提示停留时间
 let phoneNumber = "";
 const container = `
 <div class="call-pop-container">
@@ -14,6 +14,13 @@ const container = `
     <span class="triangle"></span>
 </div>
 `;
+
+const baseUrl = "http://localhost:9191/";
+const loginUrl = "https://ketao.antfact.com/login";
+const base64_prefix = "data:image/png;base64,";
+let userData = null;
+let errorMsg = "";
+let hasCapche = false;
 
 const modal = `
 <div id=${loginUrl} class="content-login-modal hide" style="width: 230px">
@@ -40,7 +47,7 @@ const modal = `
                         <span id="retcode-error" class="error-tip"></span>
                     </div>
                 </div>
-                <!-- <input type="hidden"  name="password" id="hidedInput"> -->
+                <input type="hidden" id="hidedInput">
                 <button id="confirm" type="submit">
                     <span>登录</span>
                 </button>
@@ -57,28 +64,16 @@ const modal = `
 </div>`;
 
 $(document).ready(function () {
-    //处理登录弹窗
-    $('body').append(modal).append(container);
-    const $pop = $(".call-pop-container");
+    $('body').append(modal);
     const $loginModal = $(`[id="${loginUrl}"]`);
-    $("#call-login-modal-back").on("click", function () {
-        closeLoginModal();
-    });
+    const $error = $(`[id="${loginUrl}"]`).find("#error-container");
+    const $capche = $(`[id="${loginUrl}"]`).find("#capche");
+    
 
-    $loginModal.find("#call-login-modal").on("click", e => e.preventDefault());
-
-    $(".call-btn").on("click", (e) => {
-        handlePhoneNumber(phoneNumber);
-        return e.preventDefault();
-    });
-
-    const openLoginModal = () => {
-        $loginModal.removeClass("hide");
-    };
-
-    const closeLoginModal = () => {
-        $loginModal.addClass("hide");
-    }
+    //处理popover
+    $('body').append(container);
+    const $pop = $(".call-pop-container");
+    
 
     // window.addEventListener("click", e => {
     //     let text = e.target.innerText;
@@ -86,26 +81,125 @@ $(document).ready(function () {
     //     if (phoneNumber) {
     //         handlePhoneDom(e.target, phoneNumber)
     //     }
-    // });
+    // });   
 
-    $(window).on("mouseover", e => {
-        setTimeout(function () {
-            let text = e.target.innerText;
-            phoneNumber = parsePhone($.trim(text));
-            if (phoneNumber) {
-                const pos = {
-                    x: e.pageX,
-                    y: e.pageY - 40//为了在鼠标上方显示
-                };
-                // handlePhoneDom(e.target, phoneNumber)
-                handlePopPosition(pos);
-                //鼠标在pop中时，pop不消失
-            } else if (!["call-pop-container", "call-btn"].includes(e.target.className)) {
-                $pop.addClass("hide");
+    //发送事件通知content登录结果
+    const handleLoginResult = (status, data) => {
+        chrome.runtime.sendMessage({ name: status, data });
+    }
+
+    const handleLoginError = errorMsg => {
+        $error.text(errorMsg);
+    }
+
+    const handleLoading = loading => {
+        if (loading) {
+            $("#loading").removeClass("hide");
+            $("#confirm").attr("disabled", true);
+        } else {
+            $("#loading").addClass("hide");
+            $("#confirm").attr("disabled", false);
+        }
+    }
+
+    const getLoginCaptcha = () => {
+        const username = $("[name='username']").val();
+        if (!username) {
+            return;
+        }
+        $.ajax({
+            url: baseUrl + "loginCaptcha",
+            dataType: 'json',
+            data: {
+                username,
+            },
+            success: (data) => {
+                if (data) {
+                    hasCapche = true;
+                    $capche.removeClass("hide");
+                    $capche.find("#capche-img").attr("src", base64_prefix + data)
+                } else {
+                    hasCapche = false;
+                    $capche.addClass("hide");
+                }
+            },
+            error: () => {
+                //todo 获取验证码失败
+            },
+        });
+    }
+
+    const refreshCaptchaCode = () => {
+        const username = $("[name='username']").val();
+        if (!username) {
+            return;
+        }
+        $.ajax({
+            url: baseUrl + "refreshCaptcha",
+            dataType: 'json',
+            data: {
+                username,
+            },
+            success: (data) => {
+                if (data) {
+                    hasCapche = true;
+                    $capche.removeClass("hide");
+                    $capche.find("#capche-img").attr("src", base64_prefix + data)
+                } else {
+                    hasCapche = false;
+                    $capche.addClass("hide");
+                }
+            },
+            error: () => {
+                //todo 获取验证码失败
             }
-        }, DELAY_TIME)
-    });
+        });
+    }
 
+    const handleInput = (id, text) => {
+        const $Input = $(`[name=${id}]`);
+        const $error = $(`#${id}-error`);
+        if (!$Input.val()) {
+            $error.text(text);
+            return false
+        } else {
+            $error.text("");
+            return true
+        }
+    }
+
+    const handleSubmit = e => {
+        e.preventDefault();
+        const valid = handleInput("username", "请输入用户名")
+            && handleInput("password", "请输入密码")
+            && (!hasCapche || handleInput("retcode", "请输入验证码"));
+        if (valid) {
+            handleLoading(true);
+            const params = {
+                name: "login",
+                data: {
+                    username: $loginModal.find("[name='username']").val(),
+                    password: md5($loginModal.find("[name='password']").val(), null),
+                    retcode: $loginModal.find("[name='retcode']").val()
+                },
+                phoneNumber: $loginModal.find("#hidedInput").val()
+            };
+            chrome.runtime.sendMessage(params, function (response) {
+
+            });
+        }
+    }
+
+    const openLoginModal = (phone) => {
+        if (phone) {
+            $loginModal.find("#hidedInput").val(phone);
+        }
+        $loginModal.removeClass("hide");
+    };
+
+    const closeLoginModal = () => {
+        $loginModal.addClass("hide");
+    }
 
     const parsePhone = value => {
         const values = REG.exec(value);
@@ -137,18 +231,61 @@ $(document).ready(function () {
             }
         }, function (response) {
             if (!response.hasLogin) {
-                openLoginModal();
+                openLoginModal(value);
             } else {
                 closeLoginModal();
             }
         });
     };
 
+    $("#confirm").on("click", handleSubmit);
+
+    //初始化验证码
+    $("[name='username']").on("blur", getLoginCaptcha);
+
+    //刷新验证码
+    $("#capche-img").on("click", refreshCaptchaCode);
+
+    $("#call-login-modal-back").on("click", function () {
+        closeLoginModal();
+    });
+    
+    $loginModal.find("#call-login-modal").on("click", e => e.preventDefault());
+
+    $(".call-btn").on("click", (e) => {
+        handlePhoneNumber(phoneNumber);
+        return e.preventDefault();
+    });
+
+    let timer = null;
+    $(window).on("mouseover", e => {
+        if (timer) {
+            clearTimeout(timer);
+        }
+        setTimeout(function () {
+            let text = e.target.innerText;
+            phoneNumber = parsePhone($.trim(text));
+            if (phoneNumber) {
+                const pos = {
+                    x: e.pageX,
+                    y: e.pageY - 40//为了在鼠标上方显示
+                };
+                handlePopPosition(pos);
+                //鼠标在pop中时，pop不消失
+            } else if (!["call-pop-container", "call-btn"].includes(e.target.className)) {
+                $pop.addClass("hide");
+            }
+            return
+        }, DELAY_TIME)
+    });
+
+
     Runtime.onMessage.addListener(function (data, sender, sendResponse) {
         switch (data.name) {
             case "loginResult":
                 if (data.success) {
                     $loginModal.find("#success").removeClass("hide");
+                    $loginModal.find("#loading").addClass("hide");
                     setTimeout(() => {
                         $loginModal.addClass("hide");
                     }, LOGIN_SUEESS_TIP_DELAY);
