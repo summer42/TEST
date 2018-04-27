@@ -1,0 +1,41 @@
+{
+    "name": "Test Extension",
+    "manifest_version": 2,
+    "version": "0.1",
+    "description": "通过客套系统拨打电话",
+    "browser_action": {
+        "default_icon": "icon.png",
+        "default_popup": "popup.html"
+    },
+    "background": {
+        "scripts": [
+            "dep/jquery.min.js",
+            "background.js"
+        ]
+    },
+    "permissions": [
+        "tabs",
+        "contextMenus",
+        "cookies",
+        "http://*/*",
+                "https://*/*"
+    ],
+    "content_scripts": [
+        {
+            "matches": [
+                "http://*/*",
+                "https://*/*"
+            ],
+            "css": [
+                "css/style.css"
+            ],
+            "js": [
+                "dep/jquery.min.js",
+                "dep/md5.min.js",
+                "content.js",
+                "login.js"
+            ]
+        }
+    ],
+    "content_security_policy": "script-src 'self' https://ketao.antfact.com; object-src 'self'"
+}
