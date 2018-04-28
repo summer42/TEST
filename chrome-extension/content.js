@@ -1,26 +1,28 @@
 
-const REG = /(^1[3-9]\d{9}$)|(^0\d{2,3}-?\d{5,8}$)/;
+const REG = /(^\d{8}$)|(^1[3-9]\d{9}$)|(^0\d{2,3}-?\d{5,8}$)/;
 // const REG = /(1[3-9]\d{9})|(0\d{2,3}-?\d{5,8})/ig;
 //缓存chrome.runtime 防止在注入的代码中拿不到
 const Runtime = chrome.runtime;
 const DELAY_TIME = 1100;
 const LOGIN_SUEESS_TIP_DELAY = 1200;//登陆成功后的提示停留时间
+let timer = null;//鼠标经过的延时器
 let phoneNumber = "";
+const baseUrl = "http://192.168.51.5:9191";
+const loginUrl = "https://ketao.antfact.com/login";
+const base64_prefix = "data:image/png;base64,";
+let userData = null;
+let errorMsg = "";
+let hasCapche = false;
+const TOP_DISTANCE = 60;
+const DEFAULT_CALL_BTN_TEXT = "拨打电话";
 const container = `
-<div class="call-pop-container">
+<div class="call-pop-container hide">
     <span class="btn-bar">        
         <button class="call-btn">拨打电话</button>
     </span>
     <span class="triangle"></span>
 </div>
 `;
-
-const baseUrl = "http://localhost:9191/";
-const loginUrl = "https://ketao.antfact.com/login";
-const base64_prefix = "data:image/png;base64,";
-let userData = null;
-let errorMsg = "";
-let hasCapche = false;
 
 const modal = `
 <div id=${loginUrl} class="content-login-modal hide" style="width: 230px">
@@ -53,7 +55,7 @@ const modal = `
                 </button>
             </form>
             <span class="hide" id="success">
-                登陆成功,鼠标停留在电话号码上可以拨打电话
+                登陆成功,鼠标选中电话号码可以拨打电话
             </span>
             <span class="hide" id="loading">
                 登录中...
@@ -68,12 +70,13 @@ $(document).ready(function () {
     const $loginModal = $(`[id="${loginUrl}"]`);
     const $error = $(`[id="${loginUrl}"]`).find("#error-container");
     const $capche = $(`[id="${loginUrl}"]`).find("#capche");
-    
+
 
     //处理popover
     $('body').append(container);
+    const $callBtn = $(".call-btn");
     const $pop = $(".call-pop-container");
-    
+
 
     //发送事件通知content登录结果
     const handleLoginResult = (status, data) => {
@@ -82,6 +85,7 @@ $(document).ready(function () {
 
     const handleLoginError = errorMsg => {
         $error.text(errorMsg);
+        $loginModal.find("#loading").addClass("hide");
     }
 
     const handleLoading = loading => {
@@ -161,7 +165,7 @@ $(document).ready(function () {
     }
 
     const handleSubmit = e => {
-        e.preventDefault();
+        e.stopPropagation();
         const valid = handleInput("username", "请输入用户名")
             && handleInput("password", "请输入密码")
             && (!hasCapche || handleInput("retcode", "请输入验证码"));
@@ -198,20 +202,9 @@ $(document).ready(function () {
         return values && values[0];
     };
 
-    const handlePhoneDom = (dom, phoneNumber) => {
-        const $dom = $(dom);
-        $dom.append(container);
-        $(".call-btn").on("click", (e) => {
-            handlePhoneNumber(phoneNumber);
-            return e.preventDefault();
-        })
-        $(".call-pop-back").on("click", function (e) {
-            $dom.find(".call-pop-container").remove();
-        });
-    };
-
     const handlePopPosition = ({ x, y }) => {
-        $pop.css({ "left": x + "px", "top": y + "px" }).removeClass("hide");
+        handleCallStatus("static");
+        $pop.css({ "left": x + "px", "top": (y - TOP_DISTANCE) + "px" }).removeClass("hide");
     };
 
     const handlePhoneNumber = value => {
@@ -222,7 +215,7 @@ $(document).ready(function () {
                 value
             }
         }, function (response) {
-            if (!response.hasLogin) {
+            if (response && !response.hasLogin) {
                 openLoginModal(value);
             } else {
                 closeLoginModal();
@@ -241,41 +234,52 @@ $(document).ready(function () {
     $("#call-login-modal-back").on("click", function () {
         closeLoginModal();
     });
-    
-    $loginModal.find("#call-login-modal").on("click", e => e.preventDefault());
 
-    $(".call-btn").on("click", (e) => {
+    $loginModal.find("#call-login-modal").on("click", e => e.stopPropagation());
+
+    $callBtn.on("click", (e) => {
         handlePhoneNumber(phoneNumber);
-        return e.preventDefault();
+        return e.stopPropagation();
     });
 
-    let timer = null;
-    $(window).on("mouseover", e => {
+    $(document).on("click", e => {
         if (timer) {
             clearTimeout(timer);
         }
-        setTimeout(function () {
-            let text = e.target.innerText;
-            phoneNumber = parsePhone($.trim(text));
-            if (phoneNumber) {
-                const pos = {
-                    x: e.pageX,
-                    y: e.pageY - 40//为了在鼠标上方显示
-                };
-                handlePopPosition(pos);
-                //鼠标在pop中时，pop不消失
-            } else if (!["call-pop-container", "call-btn"].includes(e.target.className)) {
+        timer = setTimeout(function () {
+            const text = window.getSelection().toString();
+            // const text = e.target.innerText;
+            if (text) {
+                phoneNumber = parsePhone($.trim(text));
+                if (phoneNumber) {
+                    const pos = {
+                        x: e.pageX,
+                        y: e.pageY
+                    };
+                    handlePopPosition(pos);
+                    //鼠标在pop中时，pop不消失
+                } else if (!["call-pop-container", "call-btn"].includes(e.target.className)) {
+                    $pop.addClass("hide");
+                }
+            } else {
                 $pop.addClass("hide");
             }
-            return
-        }, DELAY_TIME)
+        }, 100)
     });
 
+    const handleCallStatus = status => {
+        if (status == "success") {
+            $callBtn.text("已拨出电话,请稍后").attr("disabled", true);
+        } else if ("static") {
+            $pop.removeClass("hide");
+            $callBtn.text(DEFAULT_CALL_BTN_TEXT).attr("disabled", false);
+        }
+    }
 
-    Runtime.onMessage.addListener(function (data, sender, sendResponse) {
-        switch (data.name) {
+    Runtime.onMessage.addListener(function (params, sender, sendResponse) {
+        switch (params.name) {
             case "loginResult":
-                if (data.success) {
+                if (params.data.success) {
                     $loginModal.find("#success").removeClass("hide");
                     $loginModal.find("#loading").addClass("hide");
                     setTimeout(() => {
@@ -284,10 +288,13 @@ $(document).ready(function () {
                 }
                 break;
             case "loginError":
-
+                handleLoginError(params.data.errorMsg);
                 break;
-            default:
+            case "callResult":
+                if (params.data && params.data.code === 0) {
+                    handleCallStatus("success");
+                }
                 break;
         }
-    })
+    });
 })

@@ -8,14 +8,15 @@
     <title>登录</title>
 </head>
 <link rel="stylesheet" href="css/style.css">
+
 <body>
     <div style="width: 230px">
-        <span>
-            <img class="logo" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAoCAYAAACM/rhtAAADDUlEQVRYR+3ZP0wTURwH8O/JaHEVxAFjUwMLDR1wwHgMKlE6leVYlETbARNEIDrYtIYF/8V2cCgmCIt1gK2DhsEj0UQSNGWBSNC4GJ3bc8Rn3ouv3r3e/ztDB97SNL2+93m/d+/3fr1KANAdl2W0IScBMn1/0I0AKvZx/1tVVSWKk9rw9qBRZuOTfQxJ3f2yKkk435JAgnXpVEImrYjjpkNg0NUJHMHeWBTtkaM41h5Bra5h49NWUJPh+76BF+VB3Ls9gZMnOgwdUuSL8gqKC8uhQH0BH+buYDQ5bAvY3t3DWGaKRTVI8ww0w+3sfkFN0zDQ32ewhIH0BNTj6tovLL5cYcupjxKN7GT6Gro6jzNsUKRroIhT0rfY4GaNbphyqYCe2OnASFdALzgODgvpCLTDdXV2IDs9gbOJOEszHzarKD5fxsbHKnOGgbQF2uF6YlGUS08ZQmyz+QdYrbwOBWkJ9Ivj2LCQpkAvuDX1PRb/7mSavCfTVxsBDQPZBPSC0wO4ii79q4UCO/5oC4o0ALPTNzGupFjHNM/pU4l4z5nh/gfSANxSK2zmQXBhIw1Aeg+lksMolpYaSdhL5MTdHMZy26aZIDirSGZmslhT37lOQZbAMHAcOa6MsoROGz2340PJRrCdkrkpMEwcl3zd/PfD8VxSwfcfP10hm4BOuAvyIDvS6pq3Ok8PvDJ2AztCoWEVSQPQCfcofxepkUtsmZTMVNMgVoUpnVTp8VwjffXJI66roAbQCUd7pHUePyncIsV+5548YzWkVRMjyYBucLxDHkV+w9tFUux3tfIGs/l5Sxz/QI+ULivXib4qsTshvCD94kSkVKtrxOzcdJqmGEma33gdOJCIs3uOl2JuIyeOSb8vEULYow83kRM70CP5ktNXfY3oF8fHYkA/OLPlFicQFEf7k2Zy84RXv07LavW5fnfTa2ixUSgt2e5Wt2M5/iZx21F7JILeM1F2+fbnPc+J3Gqc0IBuJ+L1ukOg14iJ17f+I+CWf4hOQ8r+hjiCfKs8TCcE6/iNPP0b4g86WpEdkgWGGwAAAABJRU5ErkJggg==">
-            <span style="line-height:40px;font-size:14px;">请使用客套账户登录</span>
-        </span>
-        <div>
-            <form id="login-form" action="https://ketao.antfact.com/login" method="post" autocomplete="off">
+        <div id="login-form">
+            <span>
+                <img class="logo" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAoCAYAAACM/rhtAAADDUlEQVRYR+3ZP0wTURwH8O/JaHEVxAFjUwMLDR1wwHgMKlE6leVYlETbARNEIDrYtIYF/8V2cCgmCIt1gK2DhsEj0UQSNGWBSNC4GJ3bc8Rn3ouv3r3e/ztDB97SNL2+93m/d+/3fr1KANAdl2W0IScBMn1/0I0AKvZx/1tVVSWKk9rw9qBRZuOTfQxJ3f2yKkk435JAgnXpVEImrYjjpkNg0NUJHMHeWBTtkaM41h5Bra5h49NWUJPh+76BF+VB3Ls9gZMnOgwdUuSL8gqKC8uhQH0BH+buYDQ5bAvY3t3DWGaKRTVI8ww0w+3sfkFN0zDQ32ewhIH0BNTj6tovLL5cYcupjxKN7GT6Gro6jzNsUKRroIhT0rfY4GaNbphyqYCe2OnASFdALzgODgvpCLTDdXV2IDs9gbOJOEszHzarKD5fxsbHKnOGgbQF2uF6YlGUS08ZQmyz+QdYrbwOBWkJ9Ivj2LCQpkAvuDX1PRb/7mSavCfTVxsBDQPZBPSC0wO4ii79q4UCO/5oC4o0ALPTNzGupFjHNM/pU4l4z5nh/gfSANxSK2zmQXBhIw1Aeg+lksMolpYaSdhL5MTdHMZy26aZIDirSGZmslhT37lOQZbAMHAcOa6MsoROGz2340PJRrCdkrkpMEwcl3zd/PfD8VxSwfcfP10hm4BOuAvyIDvS6pq3Ok8PvDJ2AztCoWEVSQPQCfcofxepkUtsmZTMVNMgVoUpnVTp8VwjffXJI66roAbQCUd7pHUePyncIsV+5548YzWkVRMjyYBucLxDHkV+w9tFUux3tfIGs/l5Sxz/QI+ULivXib4qsTshvCD94kSkVKtrxOzcdJqmGEma33gdOJCIs3uOl2JuIyeOSb8vEULYow83kRM70CP5ktNXfY3oF8fHYkA/OLPlFicQFEf7k2Zy84RXv07LavW5fnfTa2ixUSgt2e5Wt2M5/iZx21F7JILeM1F2+fbnPc+J3Gqc0IBuJ+L1ukOg14iJ17f+I+CWf4hOQ8r+hjiCfKs8TCcE6/iNPP0b4g86WpEdkgWGGwAAAABJRU5ErkJggg==">
+                <span style="line-height:40px;font-size:14px;">请使用客套账户登录</span>
+            </span>
+            <form action="https://ketao.antfact.com/login" method="post" autocomplete="off">
                 <div class="input-container">
                     <div class="item-container">
                         <input placeholder="用户名/手机/邮箱" type="text" name="username" autocomplete="off" value="">
@@ -36,14 +37,14 @@
                     <span>登录</span>
                 </button>
             </form>
-            <span class="hide" id="success">
-                登陆成功,鼠标停留在电话号码上可以拨打电话
-            </span>
-            <span class="hide" id="loading">
-                登录中...
-            </span>
-            <span class="error-tip" id="error-container"></span>
         </div>
+        <span class="hide" id="success">
+            登陆成功,鼠标选中电话号码可以拨打电话
+        </span>
+        <span class="hide" id="loading">
+            登录中...
+        </span>
+        <span class="error-tip" id="error-container"></span>
     </div>
 </body>
 <script src="dep/jquery.min.js"></script>

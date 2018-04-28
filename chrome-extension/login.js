@@ -3,24 +3,32 @@ $(document).ready(function () {
         name: "login connect"
     });
     //询问background是否登录
-    console.log("isLogin")
     port.postMessage({
         name: "isLogin"
     });
-    port.onMessage.addListener(function (data) {
-        if (data.hasLogin) {
-            $loginModal.addClass("hide");
-            $("#success").removeClass("hide");
+    port.onMessage.addListener(function (params) {
+        switch (params.name) {
+            case "hasLogin":
+                //监听background的是否登录消息
+                if (params.data) {
+                    $loginModal.addClass("hide");
+                    $("#success").removeClass("hide");
+                } else {
+                    $loginModal.removeClass("hide");
+                    $("#success").addClass("hide");
+                }
+                break;
+            case "loginResult":
+                //监听登录成功消息
+                if (params.data.success) {
+                    handleLoginSuccess();
+                } else {
+                    handleLoginError(data.errorMsg);
+                }
+                break;            
         }
-        if (data.success) {
-            $("#success").removeClass("hide");
-            $("#loading").addClass("hide");
-            $loginModal.addClass("hide");
-        }
-        //todo error
     });
-    const baseUrl = "http://localhost:9191/";
-    const loginUrl = "https://localhost:9191/login";
+    const baseUrl = "http://192.168.51.5:9191";
     const base64_prefix = "data:image/png;base64,";
 
     let errorMsg = "";
@@ -44,7 +52,7 @@ $(document).ready(function () {
                     retcode: $loginModal.find("[name='retcode']").val()
                 }
             };
-
+            //发送登录事件
             port.postMessage(params);
         }
     }
@@ -54,7 +62,14 @@ $(document).ready(function () {
         chrome.runtime.sendMessage({ name: status, data });
     }
 
+    const handleLoginSuccess = () => {
+        $("#success").removeClass("hide");
+        $("#loading").addClass("hide");
+        $loginModal.addClass("hide");
+    }
+
     const handleLoginError = errorMsg => {
+        $("#loading").addClass("hide");
         $error.text(errorMsg);
     }
 
@@ -90,7 +105,7 @@ $(document).ready(function () {
                 }
             },
             error: () => {
-                //todo 获取验证码失败
+                handleLoginError("网络繁忙，请稍后重试")
             },
         });
     }
@@ -117,7 +132,7 @@ $(document).ready(function () {
                 }
             },
             error: () => {
-                //todo 获取验证码失败
+                handleLoginError("网络繁忙，请稍后重试")
             }
         });
     }
