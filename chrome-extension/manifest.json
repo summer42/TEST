@@ -1,7 +1,7 @@
 {
-    "name": "Test Extension",
+    "name": "打电话",
     "manifest_version": 2,
-    "version": "0.1",
+    "version": "0.2",
     "description": "通过客套系统拨打电话",
     "browser_action": {
         "default_icon": "icon.png",

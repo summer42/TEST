@@ -53,7 +53,7 @@ const modal = `
                 </button>
             </form>
             <span class="hide" id="success">
-                登陆成功,右键点击电话号码可以拨打电话
+                登陆成功,鼠标停留在电话号码上可以拨打电话
             </span>
             <span class="hide" id="loading">
                 登录中...
@@ -74,14 +74,6 @@ $(document).ready(function () {
     $('body').append(container);
     const $pop = $(".call-pop-container");
     
-
-    // window.addEventListener("click", e => {
-    //     let text = e.target.innerText;
-    //     const phoneNumber = parsePhone($.trim(text));
-    //     if (phoneNumber) {
-    //         handlePhoneDom(e.target, phoneNumber)
-    //     }
-    // });   
 
     //发送事件通知content登录结果
     const handleLoginResult = (status, data) => {

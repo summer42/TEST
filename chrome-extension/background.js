@@ -4,17 +4,13 @@ const baseUrl = "http://localhost:9191";
 let userData = null;
 const Runtime = chrome.runtime;
 
+//用于同content通信(short connect, sendResponse 只能触发一次onMessage)
 Runtime.onMessage.addListener(function (params, sender, sendResponse) {
     console.log(params.name, params.data);
-    // sendResponse({
-    //     loading: true
-    // })
     switch (params.name) {
         case "login":
             handleLogin(params.data).then(result => {
-                // handleLoading(false);
                 userData = result;
-
                 chrome.tabs.query({
                     active: true,
                 }, tabs => {
@@ -28,7 +24,7 @@ Runtime.onMessage.addListener(function (params, sender, sendResponse) {
                 getUserPhoneNumber(userData.userid).then(result => {
                     userData.phone_order = result.phone_order;
                     if (params.phoneNumber) {
-                        return handleCall(params.phoneNumber)                            
+                        return handleCall(params.phoneNumber)
                     }
                 }).then(result => {
                     console.log(result);
@@ -68,6 +64,28 @@ Runtime.onMessage.addListener(function (params, sender, sendResponse) {
             break;
     }
 });
+
+//用于同popup通信(long connect)
+chrome.extension.onConnect.addListener(function(port) {
+    console.log("Connected .....");    
+    port.onMessage.addListener(function(params) {
+         if (params.name == "login") {
+            handleLogin(params.data).then(result => {
+                userData = result;
+                return getUserPhoneNumber(userData.userid)
+            }).then(result => {
+                userData.phone_order = result.phone_order;
+                port.postMessage({
+                    success: true
+                });
+            })
+         } else if (params.name == "isLogin") {
+            port.postMessage({
+                hasLogin: userData
+            });
+         }         
+    });
+})
 
 const handleLogin = data => $.ajax({
     url: baseUrl + "/extensionLogin",
